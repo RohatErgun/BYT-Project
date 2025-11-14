@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using Electronic_Store.Entities.Abstract;
 
-namespace Electronic_Store.Entities
+namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
-    public abstract class Product : BaseEntity
+    public abstract class ProductEntity : BaseEntity
     {
         // Class extent
-        private static List<Product> _productsExtent = new List<Product>();
-        public static IReadOnlyList<Product> ProductsExtent => _productsExtent.AsReadOnly();
+        private static List<ProductEntity> _productsExtent = new List<ProductEntity>();
+        public static IReadOnlyList<ProductEntity> ProductsExtent => _productsExtent.AsReadOnly();
 
      
         // Mandatory attributes
@@ -21,7 +22,7 @@ namespace Electronic_Store.Entities
         private string _material;
 
         // Constructor
-        protected Product(decimal price, string brand, string model, string color, string material)
+        protected ProductEntity(decimal price, string brand, string model, string color, string material)
         {
             // Validate mandatory attributes
             if (price < 0) throw new ArgumentException("Price cannot be negative.");
@@ -77,10 +78,10 @@ namespace Electronic_Store.Entities
         }
 
         // Class extent management
-        private static void AddProduct(Product product)
+        private static void AddProduct(ProductEntity productEntity)
         {
-            if (product == null) throw new ArgumentException("Product cannot be null.");
-            _productsExtent.Add(product);
+            if (productEntity == null) throw new ArgumentException("Product cannot be null.");
+            _productsExtent.Add(productEntity);
         }
 
         // Extent persistence
@@ -89,7 +90,7 @@ namespace Electronic_Store.Entities
             try
             {
                 using StreamWriter file = File.CreateText(path);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Product>), new Type[] { typeof(Product) });
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<ProductEntity>), new Type[] { typeof(ProductEntity) });
                 xmlSerializer.Serialize(file, _productsExtent);
             }
             catch (Exception ex)
@@ -109,8 +110,8 @@ namespace Electronic_Store.Entities
                 }
 
                 using StreamReader file = File.OpenText(path);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Product>), new Type[] { typeof(Product) });
-                _productsExtent = (List<Product>)xmlSerializer.Deserialize(file) ?? new List<Product>();
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<ProductEntity>), new Type[] { typeof(ProductEntity) });
+                _productsExtent = (List<ProductEntity>)xmlSerializer.Deserialize(file) ?? new List<ProductEntity>();
             }
             catch
             {

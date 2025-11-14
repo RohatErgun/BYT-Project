@@ -1,15 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Xml.Serialization;
+using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.Concrete;
 
 namespace Electronic_Store.Entities
 {
     [Serializable]
-    public class Worker : BaseEntity
+    public class WorkerEntity : BaseEntity
     {
-        private static List<Worker> _workersExtent = new List<Worker>();
-        public static IReadOnlyList<Worker> WorkersExtent => _workersExtent.AsReadOnly();
+        private static List<WorkerEntity> _workersExtent = new List<WorkerEntity>();
+        public static IReadOnlyList<WorkerEntity> WorkersExtent => _workersExtent.AsReadOnly();
 
         private string _name;
         private string _surname;
@@ -18,12 +17,12 @@ namespace Electronic_Store.Entities
         private double _salary;
         private DateTime? _endDate;
 
-        public Department Department { get; internal set; }
-        public List<Report> Reports { get; } = new List<Report>();
+        public DepartmentEntity DepartmentEntity { get; internal set; }
+        public List<ReportEntity> Reports { get; } = new List<ReportEntity>();
 
         public const double YearlyPromotionRate = 0.05;
 
-        public Worker(string name, string surname, string position, DateTime startDate, double salary)
+        public WorkerEntity(string name, string surname, string position, DateTime startDate, double salary)
         {
             Name = name;
             Surname = surname;
@@ -34,7 +33,7 @@ namespace Electronic_Store.Entities
             AddWorker(this);
         }
 
-        public Worker() { }
+        public WorkerEntity() { }
 
         public string Name
         {
@@ -87,12 +86,12 @@ namespace Electronic_Store.Entities
             }
         }
 
-        private static void AddWorker(Worker worker)
+        private static void AddWorker(WorkerEntity workerEntity)
         {
-            if (worker == null)
+            if (workerEntity == null)
                 throw new ArgumentException("Worker cannot be null.");
 
-            _workersExtent.Add(worker);
+            _workersExtent.Add(workerEntity);
         }
 
         public static void SaveExtent(string path = "workers.xml")
@@ -100,7 +99,7 @@ namespace Electronic_Store.Entities
             try
             {
                 using StreamWriter file = File.CreateText(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<Worker>));
+                XmlSerializer serializer = new XmlSerializer(typeof(List<WorkerEntity>));
                 serializer.Serialize(file, _workersExtent);
             }
             catch (Exception ex)
@@ -120,8 +119,8 @@ namespace Electronic_Store.Entities
                 }
 
                 using StreamReader file = File.OpenText(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<Worker>));
-                _workersExtent = (List<Worker>)serializer.Deserialize(file) ?? new List<Worker>();
+                XmlSerializer serializer = new XmlSerializer(typeof(List<WorkerEntity>));
+                _workersExtent = (List<WorkerEntity>)serializer.Deserialize(file) ?? new List<WorkerEntity>();
             }
             catch
             {

@@ -1,13 +1,15 @@
-namespace Electronic_Store.Entities
+using Electronic_Store.Entities.Abstract;
+
+namespace Electronic_Store.Entities.Concrete
 {
     using System.Collections.Generic;
     
     [Serializable]
-    public class Department : BaseEntity
+    public class DepartmentEntity : BaseEntity
     {
         private string _address;
         private string _departmentName;
-        private List<Worker> _workers = new List<Worker>();
+        private List<WorkerEntity> _workers = new List<WorkerEntity>();
 
         public string Address
         {
@@ -25,25 +27,25 @@ namespace Electronic_Store.Entities
                 : value;
         }
 
-        public IReadOnlyList<Worker> Workers => _workers.AsReadOnly();
+        public IReadOnlyList<WorkerEntity> Workers => _workers.AsReadOnly();
 
-        public Department(string address, string departmentName)
+        public DepartmentEntity(string address, string departmentName)
         {
             Address = address;
             DepartmentName = departmentName;
         }
 
-        public Department() { }
+        public DepartmentEntity() { }
 
-        public void AddWorker(Worker worker)
+        public void AddWorker(WorkerEntity workerEntity)
         {
-            if (worker == null)
+            if (workerEntity == null)
                 throw new ArgumentException("Worker cannot be null.");
 
-            if (!_workers.Contains(worker))
+            if (!_workers.Contains(workerEntity))
             {
-                _workers.Add(worker);
-                worker.Department = this;
+                _workers.Add(workerEntity);
+                workerEntity.DepartmentEntity = this;
             }
         }
     }

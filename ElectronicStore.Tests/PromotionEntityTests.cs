@@ -1,24 +1,21 @@
-using System;
-using Electronic_Store.Entities;
-using NUnit.Framework;
-
+using Electronic_Store.Entities.Concrete;
 namespace ElectronicStore.Tests
 {
-    public class PromotionTests
+    public class PromotionEntityTests
     {
         [SetUp]
         public void Setup()
         {
             // Clear class extent before each test
-            typeof(Promotion)
+            typeof(PromotionEntity)
                 .GetField("_promotionsExtent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-                .SetValue(null, new System.Collections.Generic.List<Promotion>());
+                .SetValue(null, new System.Collections.Generic.List<PromotionEntity>());
         }
 
         [Test]
         public void Constructor_ShouldCreatePromotion_WhenValidValues()
         {
-            var promo = new Promotion(10, "Seasonal", "10% off for summer");
+            var promo = new PromotionEntity(10, "Seasonal", "10% off for summer");
 
             Assert.AreEqual(10, promo.DiscountPercentage);
             Assert.AreEqual("Seasonal", promo.Type);
@@ -30,7 +27,7 @@ namespace ElectronicStore.Tests
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                new Promotion(1, "Seasonal", "Too low discount");
+                new PromotionEntity(1, "Seasonal", "Too low discount");
             });
         }
 
@@ -39,7 +36,7 @@ namespace ElectronicStore.Tests
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                new Promotion(60, "Seasonal", "Too high discount");
+                new PromotionEntity(60, "Seasonal", "Too high discount");
             });
         }
 
@@ -48,7 +45,7 @@ namespace ElectronicStore.Tests
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                new Promotion(10, "", "Some description");
+                new PromotionEntity(10, "", "Some description");
             });
         }
 
@@ -57,21 +54,21 @@ namespace ElectronicStore.Tests
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                new Promotion(10, "Promo", "");
+                new PromotionEntity(10, "Promo", "");
             });
         }
 
         [Test]
         public void ClassExtent_ShouldAddPromotion_WhenCreated()
         {
-            var promo = new Promotion(15, "Holiday", "15% off for holidays");
-            CollectionAssert.Contains(Promotion.PromotionsExtent, promo);
+            var promo = new PromotionEntity(15, "Holiday", "15% off for holidays");
+            CollectionAssert.Contains(PromotionEntity.PromotionsExtent, promo);
         }
 
         [Test]
         public void DiscountPercentage_Setter_ShouldThrowException_WhenOutOfRange()
         {
-            var promo = new Promotion(10, "Promo", "Description");
+            var promo = new PromotionEntity(10, "Promo", "Description");
             Assert.Throws<ArgumentException>(() => promo.DiscountPercentage = 2);
             Assert.Throws<ArgumentException>(() => promo.DiscountPercentage = 55);
         }

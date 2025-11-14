@@ -1,7 +1,7 @@
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Electronic_Store.Entities;
+namespace Electronic_Store.Entities.ComplexAttributes;
 
 [Serializable]
 public class StudentCard

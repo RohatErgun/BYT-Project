@@ -5,24 +5,24 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Electronic_Store.Entities
+namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
-    public class Order
+    public class OrderEntity
     {
-        private static List<Order> _orders = new List<Order>();
+        private static List<OrderEntity> _orders = new List<OrderEntity>();
 
-        public static ReadOnlyCollection<Order> GetExtent()
+        public static ReadOnlyCollection<OrderEntity> GetExtent()
         {
             return _orders.AsReadOnly();
         }
 
-        private static void AddToExtent(Order order)
+        private static void AddToExtent(OrderEntity orderEntity)
         {
-            if (order == null)
+            if (orderEntity == null)
                 throw new ArgumentException("Order cannot be null");
 
-            _orders.Add(order);
+            _orders.Add(orderEntity);
         }
 
         private int _id;
@@ -65,14 +65,14 @@ namespace Electronic_Store.Entities
         private double _finalPrice;
         public double FinalPrice => _finalPrice;
 
-        private List<Product> _products = new List<Product>();
+        private List<ProductEntity> _products = new List<ProductEntity>();
 
-        public ReadOnlyCollection<Product> Products
+        public ReadOnlyCollection<ProductEntity> Products
         {
             get => _products.AsReadOnly();
         }
 
-        public void AddProduct(Product p)
+        public void AddProduct(ProductEntity p)
         {
             if (p == null)
                 throw new ArgumentException("Product cannot be null");
@@ -82,7 +82,7 @@ namespace Electronic_Store.Entities
             _finalPrice += (double)p.Price;
         }
 
-        public Order(int id, DateTime date, OrderStatus status)
+        public OrderEntity(int id, DateTime date, OrderStatus status)
         {
             Id = id;
             Date = date;
@@ -91,7 +91,7 @@ namespace Electronic_Store.Entities
             AddToExtent(this);
         }
 
-        private Order() { }
+        private OrderEntity() { }
 
         public static void Save(string path = "orders.xml")
         {
@@ -99,7 +99,7 @@ namespace Electronic_Store.Entities
             {
                 using (StreamWriter file = File.CreateText(path))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<Order>));
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<OrderEntity>));
                     using (XmlTextWriter writer = new XmlTextWriter(file))
                     {
                         serializer.Serialize(writer, _orders);
@@ -118,10 +118,10 @@ namespace Electronic_Store.Entities
             {
                 using (StreamReader file = File.OpenText(path))
                 {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<Order>));
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<OrderEntity>));
                     using (XmlTextReader reader = new XmlTextReader(file))
                     {
-                        _orders = (List<Order>)serializer.Deserialize(reader);
+                        _orders = (List<OrderEntity>)serializer.Deserialize(reader);
                     }
                 }
             }

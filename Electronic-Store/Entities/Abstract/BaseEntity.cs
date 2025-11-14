@@ -1,4 +1,4 @@
-namespace Electronic_Store.Entities;
+namespace Electronic_Store.Entities.Abstract;
 
 public class BaseEntity
 {

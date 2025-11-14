@@ -1,16 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Xml.Serialization;
+using Electronic_Store.Entities.Abstract;
 
-namespace Electronic_Store.Entities
+namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
-    public class Promotion
+    public class PromotionEntity : BaseEntity
     {
         // Class extent
-        private static List<Promotion> _promotionsExtent = new List<Promotion>();
-        public static IReadOnlyList<Promotion> PromotionsExtent => _promotionsExtent.AsReadOnly();
+        private static List<PromotionEntity> _promotionsExtent = new List<PromotionEntity>();
+        public static IReadOnlyList<PromotionEntity> PromotionsExtent => _promotionsExtent.AsReadOnly();
 
         // Class attributes (static)
         public static readonly decimal MinPercentage = 5m;
@@ -22,7 +20,7 @@ namespace Electronic_Store.Entities
         private string _description;
 
         // Constructor
-        public Promotion(decimal discountPercentage, string type, string description)
+        public PromotionEntity(decimal discountPercentage, string type, string description)
         {
             DiscountPercentage = discountPercentage;
             Type = type;
@@ -56,10 +54,10 @@ namespace Electronic_Store.Entities
         }
 
         // Class extent management
-        private static void AddPromotion(Promotion promotion)
+        private static void AddPromotion(PromotionEntity promotionEntity)
         {
-            if (promotion == null) throw new ArgumentException("Promotion cannot be null.");
-            _promotionsExtent.Add(promotion);
+            if (promotionEntity == null) throw new ArgumentException("Promotion cannot be null.");
+            _promotionsExtent.Add(promotionEntity);
         }
 
         // Persistence
@@ -68,7 +66,7 @@ namespace Electronic_Store.Entities
             try
             {
                 using StreamWriter file = File.CreateText(path);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Promotion>));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<PromotionEntity>));
                 xmlSerializer.Serialize(file, _promotionsExtent);
             }
             catch (Exception ex)
@@ -88,8 +86,8 @@ namespace Electronic_Store.Entities
                 }
 
                 using StreamReader file = File.OpenText(path);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<Promotion>));
-                _promotionsExtent = (List<Promotion>)xmlSerializer.Deserialize(file) ?? new List<Promotion>();
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<PromotionEntity>));
+                _promotionsExtent = (List<PromotionEntity>)xmlSerializer.Deserialize(file) ?? new List<PromotionEntity>();
             }
             catch
             {

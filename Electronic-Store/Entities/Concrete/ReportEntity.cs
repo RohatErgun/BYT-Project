@@ -1,9 +1,11 @@
-namespace Electronic_Store.Entities
+using Electronic_Store.Entities.Abstract;
+
+namespace Electronic_Store.Entities.Concrete
 {
     using System;
 
     [Serializable]
-    public class Report : BaseEntity
+    public class ReportEntity : BaseEntity
     {
         private DateTime _issuedDate;
         private string _managerName;
@@ -40,7 +42,7 @@ namespace Electronic_Store.Entities
                 : value;
         }
 
-        public Report(string managerName, string workerName, string title)
+        public ReportEntity(string managerName, string workerName, string title)
         {
             ManagerName = managerName;
             WorkerName = workerName;
@@ -48,7 +50,7 @@ namespace Electronic_Store.Entities
             _issuedDate = DateTime.Now;
         }
 
-        public Report() { }
+        public ReportEntity() { }
 
         public void GenerateReport() { }
 

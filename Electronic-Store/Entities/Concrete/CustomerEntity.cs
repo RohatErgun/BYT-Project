@@ -1,7 +1,9 @@
 using System.Xml;
 using System.Xml.Serialization;
+using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.ComplexAttributes;
 
-namespace Electronic_Store.Entities;
+namespace Electronic_Store.Entities.Concrete;
 
 [Serializable]
 public class CustomerEntity : BaseEntity
