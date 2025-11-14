@@ -7,14 +7,14 @@ namespace Electronic_Store.Entities;
 public class CustomerEntity : BaseEntity
 {   
     //Attributes
-    private string _name;
-    private string _surname;
-    private AddressAttribute _address;
+    private string _name = null!;
+    private string _surname = null!;
+    private AddressAttribute _address = null!;
     private List<string> _email = new List<string>();
-    private string _phoneNumber;
+    private string _phoneNumber = null!;
     private DateTime _birthDate;
     private int _age;
-    private bool? _studentCard;
+    private StudentCard? _studentCard;
     
     //Validation checks
     public string Name
@@ -43,56 +43,74 @@ public class CustomerEntity : BaseEntity
         }
     }
 
-    public List<string> Email
-    {
-        get => new List<string>(_email);
-    }
+    public List<string> Email => new List<string>(_email);
 
     public void SetEmail(IEnumerable<string> emails)
     {
         if (emails == null)
         {
-            _email.Clear();
-            return;
+            throw new ArgumentException("Customer should have at least one email");
         }
         
-        List<string> validatedEmails = new List<string>();
-        foreach (var email in emails)
+        var list = emails.ToList();
+        if (list.Count < 1 || list.Count > 3)
         {
-            if (string.IsNullOrEmpty(email))
+            throw new ArgumentException("Customer should have from 1 to 3 emails");
+        }
+
+        foreach (var email in list)
+        {
+            if (string.IsNullOrWhiteSpace(email))
             {
                 throw new ArgumentException("Email cannot be empty");
             }
 
-            if (!email.Contains("@"))
+            if (!email.Contains('@'))
             {
                 throw new ArgumentException($"Email {email} is not valid");
             }
-            validatedEmails.Add(email);
         }
-        _email = validatedEmails;
+        _email = list;
     }
 
     public void AddEmail(string email)
     {
-        if (string.IsNullOrEmpty(email))
+        if (_email.Count > 3)
+        {
+            throw new ArgumentException("Customer should have at most 3 emails");
+        }
+
+        if (string.IsNullOrWhiteSpace(email))
         {
             throw new ArgumentException("Email cannot be empty");
         }
 
-        if (!email.Contains("@"))
+        if (!email.Contains('@'))
         {
             throw new ArgumentException($"Email {email} is not valid");
         }
-        
         _email.Add(email);
     }
 
     public void RemoveEmail(string email)
     {
+        if (_email.Count <= 1)
+        {
+            throw new ArgumentException("Customer should have at least one email");
+        }
         _email.Remove(email);
     }
 
+    public AddressAttribute Address
+    {
+        get => _address;
+        set
+        {
+            if (value == null)
+                throw new ArgumentException("Address cannot be null");
+            _address = value;
+        }
+    }
     public string PhoneNumber
     {
         get => _phoneNumber;
@@ -139,14 +157,14 @@ public class CustomerEntity : BaseEntity
         }
     }
 
-    public bool? StudentCard
+    public StudentCard? StudentCard
     {
         get => _studentCard;
         set
         {
-            if (value.HasValue && value.Value == true && Age < 17)
+            if (value != null && Age < 17)
             {
-                throw new ArgumentException("Student card can't be less than 17");
+                throw new ArgumentException("Customer should be at least 17 years old");
             }
             _studentCard = value;
         }
@@ -168,16 +186,17 @@ public class CustomerEntity : BaseEntity
     {
         return new List<CustomerEntity>(_extent);
     }
-
-    public CustomerEntity(string name, string surname, AddressAttribute address, string phoneNumber, DateTime birthDate, int age, bool? studentCard)
+    
+    //Constructor
+    public CustomerEntity(string name, string surname, IEnumerable<string> email, AddressAttribute address, string phoneNumber, DateTime birthDate, StudentCard? studentCard = null)
     {
-        _name = name;
-        _surname = surname;
-        _address = address;
-        _phoneNumber = phoneNumber;
-        _birthDate = birthDate;
-        _age = age;
-        _studentCard = studentCard;
+        Name = name;
+        Surname = surname;
+        Address = address;
+        PhoneNumber = phoneNumber;
+        BirthDate = birthDate;
+        SetEmail(email);
+        StudentCard = studentCard;
         
         AddCustomer(this);
     }

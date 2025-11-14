@@ -109,10 +109,9 @@ public class AddressAttribute
         try
         {
             XmlSerializer serializer = new XmlSerializer(typeof(List<AddressAttribute>));
-            using (StreamWriter writer = new StreamWriter(path))
-            {
-                serializer.Serialize(writer, _extent);
-            }
+            using StreamWriter writer = new StreamWriter(path);
+            serializer.Serialize(writer, _extent);
+            
         }
         catch (Exception e)
         {
