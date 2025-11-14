@@ -1,6 +1,11 @@
+using Electronic_Store.Entities;
+
 namespace Electronic_Store;
 
-public class Worker
+// Bag relationship create a list of reports in Worker class 
+//  public List<Report> Reports { get; } = new List<Report>();
+
+public class Worker : BaseEntity
 {
     public string Name;
     public string Surname;
