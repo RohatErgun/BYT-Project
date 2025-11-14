@@ -29,6 +29,9 @@ public class Worker : BaseEntity
         salary = this.salary;
         endDate = null;
     }
+    
+    // 1 to 1*
+    public Department Department { get; internal set; } 
 
     public const double yearlyPromotionRate = 0.05;
     
