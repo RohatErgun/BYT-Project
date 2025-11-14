@@ -1,4 +1,4 @@
-namespace TestProject1;
+namespace ElectronicStore.Tests;
 
 public class Tests
 {
