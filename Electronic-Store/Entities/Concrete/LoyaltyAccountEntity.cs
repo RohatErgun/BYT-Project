@@ -87,11 +87,15 @@ public class LoyaltyAccountEntity : BaseEntity
         AddLoyaltyAccount(this);
     }
 
+    public LoyaltyAccountEntity()
+    {
+    }
+
     public static void Save(string path = "loyaltyaccount.xml")
     {
         try
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(LoyaltyAccountEntity));
+            XmlSerializer serializer = new XmlSerializer(typeof(List<LoyaltyAccountEntity>));
             using (StreamWriter writer = new StreamWriter(path))
             {
                 serializer.Serialize(writer, _extent);
