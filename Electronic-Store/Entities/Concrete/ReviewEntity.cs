@@ -73,9 +73,9 @@ public class ReviewEntity : BaseEntity
 
     public ReviewEntity(int rating, string text, DateTime date)
     {
-        _rating = rating;
-        _text = text;
-        _date = date;
+        Rating = rating;
+        Text = text;
+        Date = date;
         
         AddReview(this);
     }
