@@ -77,21 +77,6 @@ public class AddressAttribute
         }
     }
     
-    private static List<AddressAttribute> _extent = new List<AddressAttribute>();
-
-    private static void AddAddress(AddressAttribute address)
-    {
-        if (address == null)
-        {
-            throw new ArgumentException("Address cannot be null");
-        }
-        _extent.Add(address);
-    }
-
-    public static List<AddressAttribute> GetAddress()
-    {
-        return new List<AddressAttribute>(_extent);
-    }
 
     public AddressAttribute(string country, string city, string street, int buildingNumber, string zipcode)
     {
@@ -100,55 +85,6 @@ public class AddressAttribute
         Street = street;
         BuildingNumber = buildingNumber;
         Zipcode = zipcode;
-        
-        AddAddress(this);
     }
-
-    public static void Save(string path = "address.xml")
-    {
-        try
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(List<AddressAttribute>));
-            using StreamWriter writer = new StreamWriter(path);
-            serializer.Serialize(writer, _extent);
-            
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Error saving address: {e.Message}");
-        }
-    }
-
-    public static bool Load(string path = "address.xml")
-    {
-        StreamReader file;
-        try
-        {
-            file = File.OpenText(path);
-        }
-        catch (FileNotFoundException)
-        {
-            _extent.Clear();
-            return false;
-        }
-        XmlSerializer serializer = new XmlSerializer(typeof(List<AddressAttribute>));
-        using (XmlTextReader reader = new XmlTextReader(file))
-        {
-            try
-            {
-                _extent = (List<AddressAttribute>)serializer.Deserialize(reader);
-            }
-            catch (InvalidCastException)
-            {
-                _extent.Clear();
-                return false;
-            }
-            catch (Exception)
-            {
-                _extent.Clear();
-                return false;
-            }
-        }
-        return true;
-    }
+    
 }

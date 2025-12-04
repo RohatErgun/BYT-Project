@@ -1,11 +1,8 @@
-using System.Xml;
-using System.Xml.Serialization;
 using Electronic_Store.Entities.Abstract;
 using Electronic_Store.Entities.ComplexAttributes;
 
 namespace Electronic_Store.Entities.Concrete;
 
-[Serializable]
 public class CustomerEntity : BaseEntity
 {   
     //Attributes
@@ -171,23 +168,6 @@ public class CustomerEntity : BaseEntity
         }
     }
     
-    //Class extent below
-    private static List<CustomerEntity> _extent = new List<CustomerEntity>();
-
-    private static void AddCustomer(CustomerEntity customer)
-    {
-        if (customer == null)
-        {
-            throw new ArgumentException("Customer cannot be null");
-        }
-        _extent.Add(customer);
-    }
-
-    public static List<CustomerEntity> GetCustomer()
-    {
-        return new List<CustomerEntity>(_extent);
-    }
-    
     //Constructor
     public CustomerEntity(string name, string surname, IEnumerable<string> email, AddressAttribute address, string phoneNumber, DateTime birthDate, StudentCard? studentCard = null)
     {
@@ -198,56 +178,5 @@ public class CustomerEntity : BaseEntity
         BirthDate = birthDate;
         SetEmail(email);
         StudentCard = studentCard;
-        
-        AddCustomer(this);
-    }
-
-    public static void Save(string path = "customers.xml")
-    {
-        try
-        {
-            XmlSerializer serializer = new XmlSerializer(typeof(List<CustomerEntity>));
-            using (StreamWriter writer = new StreamWriter(path))
-            {
-                serializer.Serialize(writer, _extent);
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Error saving customer: {e.Message}");
-        }
-    }
-
-    public static bool Load(string path = "customers.xml")
-    {
-        StreamReader file;
-        try
-        {
-            file = File.OpenText(path);
-        }
-        catch (FileNotFoundException)
-        {
-            _extent.Clear();
-            return false;
-        }
-        XmlSerializer serializer = new XmlSerializer(typeof(List<CustomerEntity>));
-        using (XmlTextReader reader = new XmlTextReader(file))
-        {
-            try
-            {
-                _extent = (List<CustomerEntity>)serializer.Deserialize(reader);
-            }
-            catch (InvalidCastException)
-            {
-                _extent.Clear();
-                return false;
-            }
-            catch (Exception)
-            {
-                _extent.Clear();
-                return false;
-            }
-        }
-        return true;
     }
 }

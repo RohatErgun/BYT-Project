@@ -2,6 +2,17 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a89b354a_002Ddc71_002D45c2_002Da5f3_002Dae4c8d705dd6/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="WorkerReflexiveAssociationTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerReflexiveAssociationTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.AddWorker_ShouldCreateReverseConnection&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.AssignDepartment_ShouldCreateReverseConnection&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.AddWorker_ShouldNotAllowDuplicates&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.RemoveWorker_ShouldThrow_WhenDepartmentWouldHaveZeroWorkers&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.Worker_RemoveDepartment_ShouldThrowException&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.RemoveWorker_ShouldThrowException_WhenDepartmentWouldHaveNoWorkersLeft&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.AssignDepartment_ShouldMoveWorkerFromOldDepartmentToNewDepartment&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.AddWorker_ShouldMoveWorkerFromOldDepartment_WhenCalledOnNewDepartment&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.AddWorker_ShouldThrowException_WhenWorkerIsNull&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.AssignDepartment_ShouldThrowException_WhenDepartmentIsNull&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.WorkerDepAssociationTests.RemoveWorker_ShouldNotThrow_WhenWorkerIsNull&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e3b43d6e_002Dad09_002D4c1b_002D9229_002D83ef9d122d96/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ProductToWarehouseQualifiedAndClassAssociationsTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;

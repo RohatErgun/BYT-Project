@@ -1,5 +1,4 @@
 using Electronic_Store.Entities.Abstract;
-using System;
 
 namespace Electronic_Store.Entities.Concrete
 { 
@@ -92,7 +91,7 @@ namespace Electronic_Store.Entities.Concrete
 
                 _managedBy?._listOfManagedWorkers.Remove(this);
 
-                if (value != null && value._listOfManagedWorkers.Count >= 5)
+                if (value != null && value._listOfManagedWorkers.Count > 5)
                 {
                     throw new InvalidOperationException($"{value.Name} cannot manage more than 5 workers.");
                 }
@@ -117,7 +116,7 @@ namespace Electronic_Store.Entities.Concrete
             {
                 throw new InvalidOperationException("Worker cannot be managed by himself.");
             }
-            if (_listOfManagedWorkers.Count >= 5)
+            if (_listOfManagedWorkers.Count > 5)
             {
                 throw new InvalidOperationException($"{Name} cannot manage more than 5 workers.");
             }

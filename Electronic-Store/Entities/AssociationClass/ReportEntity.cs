@@ -1,10 +1,9 @@
 using Electronic_Store.Entities.Abstract;
 
-namespace Electronic_Store.Entities.Concrete
+namespace Electronic_Store.Entities.AssociationClass
 {
     using System;
 
-    [Serializable]
     public class ReportEntity : BaseEntity
     {
         private DateTime _issuedDate;
@@ -47,7 +46,7 @@ namespace Electronic_Store.Entities.Concrete
             ManagerName = managerName;
             WorkerName = workerName;
             Title = title;
-            _issuedDate = DateTime.Now;
+            IssuedDate = DateTime.Now;
         }
 
         public ReportEntity() { }
