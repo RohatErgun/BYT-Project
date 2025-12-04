@@ -1,15 +1,12 @@
-using System.Xml.Serialization;
 using Electronic_Store.Entities.Abstract;
-using Electronic_Store.Entities.Concrete;
 
-namespace Electronic_Store.Entities
+namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
     public class WorkerEntity : BaseEntity
     {
-        private static List<WorkerEntity> _workersExtent = new List<WorkerEntity>();
-        public static IReadOnlyList<WorkerEntity> WorkersExtent => _workersExtent.AsReadOnly();
-
+        private HashSet<WorkerEntity> _workers = new HashSet<WorkerEntity>();
+        
         private string _name;
         private string _surname;
         private string _position;
@@ -17,11 +14,7 @@ namespace Electronic_Store.Entities
         private double _salary;
         private DateTime? _endDate;
 
-        // Worker MUST belong to exactly 1 Department (1..1 multiplicity)
-        public DepartmentEntity DepartmentEntity { get; private set; }
-
-        // BAG association with Report – left unchanged for now
-        public List<ReportEntity> Reports { get; } = new List<ReportEntity>();
+        public DepartmentEntity DepartmentEntity { get; internal set; }
 
         public const double YearlyPromotionRate = 0.05;
 
@@ -33,8 +26,6 @@ namespace Electronic_Store.Entities
             StartDate = startDate;
             Salary = salary;
             _endDate = null;
-
-            AddWorkerToExtent(this);
         }
 
         public WorkerEntity() 
@@ -104,7 +95,7 @@ namespace Electronic_Store.Entities
                 _salary = value;
             }
         }
-        public void AssignDepartment(DepartmentEntity department)
+           public void AssignDepartment(DepartmentEntity department)
         {
             if (department == null)
                 throw new ArgumentNullException(nameof(department));
@@ -120,55 +111,6 @@ namespace Electronic_Store.Entities
             DepartmentEntity = department;
 
             department.InternalAddWorker(this);
-        }
-        public void RemoveDepartment()
-        {
-            throw new InvalidOperationException("A Worker must always belong to exactly one Department.");
-        }
-        private static void AddWorkerToExtent(WorkerEntity worker)
-        {
-            if (worker == null)
-                throw new ArgumentException("Worker cannot be null.");
-
-            _workersExtent.Add(worker);
-        }
-
-        public static void SaveExtent(string path = "workers.xml")
-        {
-            try
-            {
-                using StreamWriter file = File.CreateText(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<WorkerEntity>));
-                serializer.Serialize(file, _workersExtent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error saving workers extent: " + ex.Message);
-            }
-        }
-
-        public static bool LoadExtent(string path = "workers.xml")
-        {
-            try
-            {
-                if (!File.Exists(path))
-                {
-                    _workersExtent.Clear();
-                    return false;
-                }
-
-                using StreamReader file = File.OpenText(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<WorkerEntity>));
-                _workersExtent = (List<WorkerEntity>)serializer.Deserialize(file)
-                    ?? new List<WorkerEntity>();
-            }
-            catch
-            {
-                _workersExtent.Clear();
-                return false;
-            }
-
-            return true;
         }
         public void ApplyYearlyPromotion()
         {
