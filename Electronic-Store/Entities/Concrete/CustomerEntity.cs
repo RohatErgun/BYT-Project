@@ -15,7 +15,6 @@ public class CustomerEntity : BaseEntity
     private List<string> _email = new List<string>();
     private string _phoneNumber = null!;
     private DateTime _birthDate;
-    private int _age;
     private StudentCard? _studentCard;
     
     //Validation checks

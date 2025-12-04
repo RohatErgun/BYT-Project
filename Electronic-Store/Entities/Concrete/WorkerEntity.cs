@@ -1,24 +1,24 @@
 using Electronic_Store.Entities.Abstract;
 
 namespace Electronic_Store.Entities.Concrete
-{
-    [Serializable]
+{ 
     public class WorkerEntity : BaseEntity
     {
-        private HashSet<WorkerEntity> _workers = new HashSet<WorkerEntity>();
-        
-        private string _name;
-        private string _surname;
-        private string _position;
+        private string _name = null!;
+        private string _surname = null!;
+        private string _position = null!;
         private DateTime _startDate;
         private double _salary;
+        private WorkerEntity? _managedBy;
+        private HashSet<WorkerEntity> _listOfManagedWorkers = new HashSet<WorkerEntity>();
+        public IReadOnlyCollection<WorkerEntity> ManagedWorkers => _listOfManagedWorkers;
         private DateTime? _endDate;
-
+        
         public DepartmentEntity DepartmentEntity { get; internal set; }
 
-        public const double YearlyPromotionRate = 0.05;
+        private const double YearlyPromotionRate = 0.05;
 
-        public WorkerEntity(string name, string surname, string position, DateTime startDate, double salary)
+        public WorkerEntity(string name, string surname, string position, DateTime startDate, double salary, WorkerEntity? managedBy)
         {
             Name = name;
             Surname = surname;
@@ -26,6 +26,7 @@ namespace Electronic_Store.Entities.Concrete
             StartDate = startDate;
             Salary = salary;
             _endDate = null;
+            ManagedBy = managedBy;
         }
 
         public WorkerEntity() { }
@@ -33,7 +34,14 @@ namespace Electronic_Store.Entities.Concrete
         public string Name
         {
             get => _name;
-            set => _name = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Name cannot be empty.") : value;
+            set
+            {
+                if (String.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Name cannot be empty");
+                }
+                _name = value;
+            }
         }
 
         public string Surname
@@ -48,6 +56,69 @@ namespace Electronic_Store.Entities.Concrete
             set => _position = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Position cannot be empty.") : value;
         }
 
+        public WorkerEntity? ManagedBy
+        {
+            get => _managedBy;
+            set
+            {
+                if (_managedBy == value) return;
+
+                _managedBy?._listOfManagedWorkers.Remove(this);
+
+                if (value != null && value._listOfManagedWorkers.Count >= 5)
+                {
+                    throw new InvalidOperationException($"{value.Name} cannot manage more than 5 workers.");
+                }
+
+                _managedBy = value;
+
+                if (_managedBy != null && !_managedBy._listOfManagedWorkers.Contains(this))
+                {
+                    _managedBy._listOfManagedWorkers.Add(this);
+                }
+            }
+        }
+
+        public void AddManagedWorker(WorkerEntity worker)
+        {
+            if (worker == null)
+            {
+                throw new ArgumentNullException(nameof(worker));
+            }
+
+            if (worker == this)
+            {
+                throw new InvalidOperationException($"Worker cannot be managed by himself.");
+            }
+            if (_listOfManagedWorkers.Count >= 5)
+            {
+                throw new InvalidOperationException($"{Name} cannot manage more than 5 workers.");
+            }
+
+            if (_listOfManagedWorkers.Add(worker))
+            {
+                if (worker._managedBy != null && worker._managedBy != this)
+                {
+                    worker._managedBy = this;
+                }
+            }
+        }
+
+        public void RemoveManagedWorker(WorkerEntity worker)
+        {
+            if (worker == null)
+            {
+                throw new ArgumentNullException(nameof(worker));
+            }
+
+            if (_listOfManagedWorkers.Remove(worker))
+            {
+                if (worker._managedBy == this)
+                {
+                    worker._managedBy = null;
+                }
+            }
+        }
         public DateTime StartDate
         {
             get => _startDate;
