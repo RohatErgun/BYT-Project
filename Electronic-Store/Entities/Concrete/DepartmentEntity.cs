@@ -1,5 +1,7 @@
 using Electronic_Store.Entities.Abstract;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Electronic_Store.Entities.Concrete
 {
@@ -27,7 +29,7 @@ namespace Electronic_Store.Entities.Concrete
                 : value;
         }
 
-        public IReadOnlyCollection<WorkerEntity> Workers => _workers;
+        public IReadOnlyCollection<WorkerEntity> Workers => _workers.ToList();
 
         public DepartmentEntity(string address, string departmentName)
         {
@@ -36,6 +38,7 @@ namespace Electronic_Store.Entities.Concrete
         }
 
         public DepartmentEntity() { }
+
         public void AddWorker(WorkerEntity worker)
         {
             if (worker == null)
@@ -51,8 +54,10 @@ namespace Electronic_Store.Entities.Concrete
 
             _workers.Add(worker);
 
-            worker.AssignDepartment(this);
+            if (worker.DepartmentEntity != this)
+                worker.AssignDepartment(this);
         }
+
         public void RemoveWorker(WorkerEntity worker)
         {
             if (worker == null)
@@ -63,27 +68,27 @@ namespace Electronic_Store.Entities.Concrete
 
             if (_workers.Count == 1)
                 throw new InvalidOperationException(
-                    "A Department must have at least one Worker (1..* multiplicity)."
+                    "A Department must have at least one Worker."
                 );
 
             _workers.Remove(worker);
 
-            worker.RemoveDepartment();
+            if (worker.DepartmentEntity == this)
+            {
+                worker.RemoveDepartment();
+            }
         }
+
         internal void InternalAddWorker(WorkerEntity worker)
         {
-            if (worker == null)
-                return;
-
-            _workers.Add(worker);
+            if (worker != null)
+                _workers.Add(worker);
         }
 
         internal void InternalRemoveWorker(WorkerEntity worker)
         {
-            if (worker == null)
-                return;
-
-            _workers.Remove(worker);
+            if (worker != null)
+                _workers.Remove(worker);
         }
     }
 }

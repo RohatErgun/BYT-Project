@@ -3,24 +3,23 @@ namespace ElectronicStore.Tests;
 using Electronic_Store.Entities.Concrete;
 using Electronic_Store.Entities;
 
+[TestFixture]
 public class WorkerDepAssociationTests
 {
-    [TestFixture]
-    public class DepartmentWorkerTests
+    // 1 — ADD CONNECTION
+    [Test]
+    public void AddWorker_ShouldCreateReverseConnection()
     {
-        [Test]
-        public void AddWorker_ShouldCreateReverseConnection()
-        {
-            var department = new DepartmentEntity("Centrum", "Electronics");
-            var worker = new WorkerEntity("Jack", "Sparrow", "Seller", DateTime.Now.AddYears(-1), 5500);
+        var department = new DepartmentEntity("Centrum", "Electronics");
+        var worker = new WorkerEntity("Jack", "Sparrow", "Seller", DateTime.Now.AddYears(-1), 5500);
 
-            department.AddWorker(worker);
+        department.AddWorker(worker);
 
-            Assert.Contains(worker, department.Workers.ToList());
-
-            Assert.AreEqual(department, worker.DepartmentEntity);
-        }
+        Assert.Contains(worker, department.Workers.ToList());
+        Assert.AreEqual(department, worker.DepartmentEntity);
     }
+
+    // 2 — ASSIGN CONNECTION
     [Test]
     public void AssignDepartment_ShouldCreateReverseConnection()
     {
@@ -28,27 +27,28 @@ public class WorkerDepAssociationTests
         var worker = new WorkerEntity("Jane", "Austin", "Cashier", DateTime.Now.AddYears(-2), 5000);
 
         worker.AssignDepartment(department);
-        
-        Assert.AreEqual(department, worker.DepartmentEntity);
 
+        Assert.AreEqual(department, worker.DepartmentEntity);
         Assert.Contains(worker, department.Workers.ToList());
     }
+
+    // 3 — NO DUPLICATES
     [Test]
     public void AddWorker_ShouldNotAllowDuplicates()
     {
         var department = new DepartmentEntity("Centrum", "Electronics");
         var worker = new WorkerEntity("Emily", "Blunt", "Manager", DateTime.Now.AddYears(-3), 11000);
-    
-        
+
         department.AddWorker(worker);
         department.AddWorker(worker); // duplicate attempt
-        
-        Assert.AreEqual(1, department.Workers.Count);
 
+        Assert.AreEqual(1, department.Workers.Count);
         Assert.AreEqual(department, worker.DepartmentEntity);
     }
+
+    // 4 — REMOVE LAST WORKER BLOCKED (1..* multiplicity)
     [Test]
-    public void RemoveWorker_ShouldThrowException_WhenWorkerWouldHaveNoDepartment()
+    public void RemoveWorker_ShouldThrow_WhenDepartmentWouldHaveZeroWorkers()
     {
         var department = new DepartmentEntity("Centrum", "Electronics");
         var worker = new WorkerEntity("Alice", "Inborderland", "Technician", DateTime.Now.AddYears(-1), 6000);
@@ -60,6 +60,8 @@ public class WorkerDepAssociationTests
             department.RemoveWorker(worker);
         });
     }
+
+    // 5 — WORKER CANNOT REMOVE ITS OWN DEPARTMENT
     [Test]
     public void Worker_RemoveDepartment_ShouldThrowException()
     {
@@ -73,6 +75,8 @@ public class WorkerDepAssociationTests
             worker.RemoveDepartment();
         });
     }
+
+    // 6 — SAME AS #4 (duplicate but harmless)
     [Test]
     public void RemoveWorker_ShouldThrowException_WhenDepartmentWouldHaveNoWorkersLeft()
     {
@@ -86,6 +90,8 @@ public class WorkerDepAssociationTests
             department.RemoveWorker(worker);
         });
     }
+
+    // 7 — EDIT CONNECTION (Worker → different Department)
     [Test]
     public void AssignDepartment_ShouldMoveWorkerFromOldDepartmentToNewDepartment()
     {
@@ -99,11 +105,11 @@ public class WorkerDepAssociationTests
         worker.AssignDepartment(deptB);
 
         Assert.IsFalse(deptA.Workers.Contains(worker));
-
         Assert.IsTrue(deptB.Workers.Contains(worker));
-
         Assert.AreEqual(deptB, worker.DepartmentEntity);
     }
+
+    // 8 — EDIT CONNECTION (Department.AddWorker triggers move)
     [Test]
     public void AddWorker_ShouldMoveWorkerFromOldDepartment_WhenCalledOnNewDepartment()
     {
@@ -113,15 +119,14 @@ public class WorkerDepAssociationTests
         var worker = new WorkerEntity("Mark", "Ruffalo", "Engineer", DateTime.Now.AddYears(-3), 13000);
 
         deptA.AddWorker(worker);
-
         deptB.AddWorker(worker);
 
         Assert.IsFalse(deptA.Workers.Contains(worker));
-
         Assert.IsTrue(deptB.Workers.Contains(worker));
-
         Assert.AreEqual(deptB, worker.DepartmentEntity);
     }
+
+    // 9 — NULL ADD
     [Test]
     public void AddWorker_ShouldThrowException_WhenWorkerIsNull()
     {
@@ -132,6 +137,8 @@ public class WorkerDepAssociationTests
             department.AddWorker(null);
         });
     }
+
+    // 10 — NULL ASSIGN
     [Test]
     public void AssignDepartment_ShouldThrowException_WhenDepartmentIsNull()
     {
@@ -142,6 +149,8 @@ public class WorkerDepAssociationTests
             worker.AssignDepartment(null);
         });
     }
+
+    // 11 — NULL REMOVE
     [Test]
     public void RemoveWorker_ShouldNotThrow_WhenWorkerIsNull()
     {

@@ -1,20 +1,18 @@
 using Electronic_Store.Entities.Abstract;
+using System;
 
 namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
     public class WorkerEntity : BaseEntity
     {
-        private HashSet<WorkerEntity> _workers = new HashSet<WorkerEntity>();
-        
         private string _name;
         private string _surname;
         private string _position;
         private DateTime _startDate;
         private double _salary;
         private DateTime? _endDate;
-
-        public DepartmentEntity DepartmentEntity { get; internal set; }
+        public DepartmentEntity DepartmentEntity { get; private set; }
 
         public const double YearlyPromotionRate = 0.05;
 
@@ -28,14 +26,31 @@ namespace Electronic_Store.Entities.Concrete
             _endDate = null;
         }
 
-        public WorkerEntity() 
+        public WorkerEntity() { }
+        public void AssignDepartment(DepartmentEntity department)
         {
-            AddWorkerToExtent(this);
+            if (department == null)
+                throw new ArgumentNullException(nameof(department));
+
+            if (DepartmentEntity == department)
+                return;
+
+            if (DepartmentEntity != null)
+            {
+                DepartmentEntity.InternalRemoveWorker(this);
+            }
+
+            DepartmentEntity = department;
+
+            department.InternalAddWorker(this);
         }
 
-        // -----------------------------
-        //   PROPERTIES
-        // -----------------------------
+        public void RemoveDepartment()
+        {
+            throw new InvalidOperationException(
+                "Worker cannot remove its own Department. This action must be done by Department."
+            );
+        }
         public string Name
         {
             get => _name;
@@ -91,27 +106,10 @@ namespace Electronic_Store.Entities.Concrete
             {
                 if (value < 0)
                     throw new ArgumentException("Salary cannot be negative.");
-
                 _salary = value;
             }
         }
-           public void AssignDepartment(DepartmentEntity department)
-        {
-            if (department == null)
-                throw new ArgumentNullException(nameof(department));
 
-            if (DepartmentEntity == department)
-                return;
-
-            if (DepartmentEntity != null)
-            {
-                DepartmentEntity.InternalRemoveWorker(this);
-            }
-
-            DepartmentEntity = department;
-
-            department.InternalAddWorker(this);
-        }
         public void ApplyYearlyPromotion()
         {
             Salary *= (1 + YearlyPromotionRate);
