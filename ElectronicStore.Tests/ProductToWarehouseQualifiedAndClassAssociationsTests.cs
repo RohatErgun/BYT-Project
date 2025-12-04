@@ -1,11 +1,6 @@
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Electronic_Store.Entities.Abstract;
 using Electronic_Store.Entities.Concrete;
-using Electronic_Store.Entities.Association;
+using Electronic_Store.Entities.AssociationClass;
 using Electronic_Store.Entities.ComplexAttributes;
 
 namespace ElectronicStore.Tests
