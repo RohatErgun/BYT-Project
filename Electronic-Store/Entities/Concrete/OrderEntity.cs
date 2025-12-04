@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using Electronic_Store.Entities.Abstract;
 
 namespace Electronic_Store.Entities.Concrete
 {

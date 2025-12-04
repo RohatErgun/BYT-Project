@@ -7,12 +7,12 @@ namespace Electronic_Store.Entities.Concrete
     [Serializable]
     public class SmartPhoneEntity : ElectronicDevice
     {
-        private string _screentype;
+        private string _screenType;
         private int _storage;
 
-        public string Screentype
+        public string ScreenType
         {
-            get => _screentype;
+            get => _screenType;
             set
             {
                 if (String.IsNullOrEmpty(value))
@@ -20,7 +20,7 @@ namespace Electronic_Store.Entities.Concrete
                     throw new ArgumentException("Screen Type cannot be empty");
                 }
 
-                _screentype = value;
+                _screenType = value;
             }
         }
 
@@ -38,5 +38,18 @@ namespace Electronic_Store.Entities.Concrete
             }
         }
         
+        // Constructor 
+        public SmartPhoneEntity(
+            // ProductEntity params
+            decimal price, string brand, string model, string color, string material,
+            // ElectronicDevice params
+            int batteryLifeHours, int warrantyMonths,
+            // SmartPhone params
+            string screenType, int storage)
+            : base(price, brand, model, color, material, batteryLifeHours, warrantyMonths)
+        {
+            ScreenType = screenType;
+            Storage = storage;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using Electronic_Store.Entities.Abstract;
 using Electronic_Store.Entities.Concrete;
 
 namespace ElectronicStore.Tests
