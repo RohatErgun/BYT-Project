@@ -20,7 +20,6 @@ namespace Electronic_Store.Entities.AssociationClass
             _warehouse = warehouse;
             _quantity = quantity;
             
-            //links
             _product.AddStock(this);
             _warehouse.AddStock(this);
         }

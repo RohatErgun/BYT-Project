@@ -7,14 +7,11 @@ namespace Electronic_Store.Entities.Concrete;
 [Serializable]
 public class WarehouseEntity : BaseEntity
 {
-    //Attributes
     private AddressAttribute _address = null!;
     
-    // Inventory List 
     private List<ProductStock> _inventory = new List<ProductStock>();
     public List<ProductStock> Inventory => _inventory;
 
-    //Validation checks
     public AddressAttribute Address
     {
         get => _address;
@@ -26,28 +23,9 @@ public class WarehouseEntity : BaseEntity
         }
     }
 
-    //Class extent below
-    private static List<WarehouseEntity> _extent = new List<WarehouseEntity>();
-
-    private static void AddWarehouse(WarehouseEntity warehouse)
-    {
-        if (warehouse == null)
-        {
-            throw new ArgumentException("Warehouse cannot be null");
-        }
-        _extent.Add(warehouse);
-    }
-
-    public static List<WarehouseEntity> GetWarehouses()
-    {
-        return new List<WarehouseEntity>(_extent);
-    }
-
-    //Constructor
     public WarehouseEntity(AddressAttribute address)
     {
         Address = address;
-        AddWarehouse(this);
     }
 
     
@@ -55,7 +33,6 @@ public class WarehouseEntity : BaseEntity
     {
         if (stock == null) return;
             
-        // Check for duplicate qualifiers before adding
         var existing = GetStockByQualifiers(
             stock.Product.Brand, stock.Product.Model, 
             stock.Product.Color, stock.Product.Material);
@@ -69,7 +46,6 @@ public class WarehouseEntity : BaseEntity
         }
     }
     
-    // Retrieves specific stock based on qualifiers [brand, model, color, material]
     public ProductStock? GetStockByQualifiers(string brand, string model, string color, string material)
     {
         return _inventory.FirstOrDefault(s => 

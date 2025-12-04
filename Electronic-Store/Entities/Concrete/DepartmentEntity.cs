@@ -1,7 +1,4 @@
 using Electronic_Store.Entities.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Electronic_Store.Entities.Concrete
 {
