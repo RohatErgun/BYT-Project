@@ -1,26 +1,36 @@
+using System;
 using Electronic_Store.Entities.Abstract;
 
 namespace Electronic_Store.Entities.Concrete
 {
-
+    [Serializable]
     public class CasesEntity : Accessory
     {
-        private string _color;
+        // Attributes
+        private string _compatibleDeviceModel;
 
-        public string Color
+        public string CompatibleDeviceModel
         {
-            get => _color;
+            get => _compatibleDeviceModel;
             set
             {
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrWhiteSpace(value))
                 {
-                    throw new ArgumentException("Color cannot be empty");    
+                    throw new ArgumentException("Compatible Device Model cannot be empty");
                 }
-
-                _color = value;
-
+                _compatibleDeviceModel = value;
             }
-            
         }
+
+        // Constructor 
+        public CasesEntity(
+            // ProductEntity params
+            decimal price, string brand, string model, string color, string material,
+            // CasesEntity params
+            string compatibleDeviceModel)
+            : base(price, brand, model, color, material, "Case")
+        {
+            CompatibleDeviceModel = compatibleDeviceModel;
+        }  
     }
 }

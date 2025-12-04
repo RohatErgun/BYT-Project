@@ -1,6 +1,7 @@
 using System.Xml;
 using System.Xml.Serialization;
 using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.Association;
 using Electronic_Store.Entities.ComplexAttributes;
 
 namespace Electronic_Store.Entities.Concrete;
@@ -10,6 +11,10 @@ public class WarehouseEntity : BaseEntity
 {
     //Attributes
     private AddressAttribute _address = null!;
+    
+    // Inventory List 
+    private List<ProductStock> _inventory = new List<ProductStock>();
+    public List<ProductStock> Inventory => _inventory;
 
     //Validation checks
     public AddressAttribute Address
@@ -47,50 +52,33 @@ public class WarehouseEntity : BaseEntity
         AddWarehouse(this);
     }
 
-    //Save
-    public static void Save(string path = "warehouses.xml")
+    
+    public void AddStock(ProductStock stock)
     {
-        try
+        if (stock == null) return;
+            
+        // Check for duplicate qualifiers before adding
+        var existing = GetStockByQualifiers(
+            stock.Product.Brand, stock.Product.Model, 
+            stock.Product.Color, stock.Product.Material);
+
+        if (existing != null && existing != stock)
+            throw new InvalidOperationException("Product with these qualifiers already exists in this warehouse.");
+
+        if (!_inventory.Contains(stock))
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(List<WarehouseEntity>));
-            using (StreamWriter writer = new StreamWriter(path))
-            {
-                serializer.Serialize(writer, _extent);
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Error saving warehouse: {e.Message}");
+            _inventory.Add(stock);
         }
     }
-
-    //Load
-    public static bool Load(string path = "warehouses.xml")
+    
+    // Retrieves specific stock based on qualifiers [brand, model, color, material]
+    public ProductStock? GetStockByQualifiers(string brand, string model, string color, string material)
     {
-        StreamReader file;
-        try
-        {
-            file = File.OpenText(path);
-        }
-        catch (FileNotFoundException)
-        {
-            _extent.Clear();
-            return false;
-        }
-
-        XmlSerializer serializer = new XmlSerializer(typeof(List<WarehouseEntity>));
-        using (XmlTextReader reader = new XmlTextReader(file))
-        {
-            try
-            {
-                _extent = (List<WarehouseEntity>)serializer.Deserialize(reader);
-            }
-            catch
-            {
-                _extent.Clear();
-                return false;
-            }
-        }
-        return true;
+        return _inventory.FirstOrDefault(s => 
+            s.Product.Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) &&
+            s.Product.Model.Equals(model, StringComparison.OrdinalIgnoreCase) &&
+            s.Product.Color.Equals(color, StringComparison.OrdinalIgnoreCase) &&
+            s.Product.Material.Equals(material, StringComparison.OrdinalIgnoreCase)
+        );
     }
 }

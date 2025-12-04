@@ -9,7 +9,7 @@ namespace Electronic_Store.Entities.Concrete
         private string _type;
 
         
-        public int Lenght
+        public int Length
         {
             get => _lenght;
             set
@@ -23,8 +23,7 @@ namespace Electronic_Store.Entities.Concrete
             }
            
         }
-
-
+        
         public string Type
         {
             get => _type;
@@ -37,6 +36,17 @@ namespace Electronic_Store.Entities.Concrete
 
                 _type = value;
             }
+        }
+        
+        public CablesEntity(
+            // ProductEntity params
+            decimal price, string brand, string model, string color, string material,
+            // Cables params
+            int length, string type)
+            : base(price, brand, model, color, material, "Cable")
+        {
+            Length = length;
+            Type = type;
         }
     }
 }
