@@ -68,7 +68,7 @@ namespace Electronic_Store.Entities.Concrete
 
             _workers.Remove(worker);
 
-            worker.RemoveDepartment();
+            // worker.RemoveDepartment();
         }
         internal void InternalAddWorker(WorkerEntity worker)
         {

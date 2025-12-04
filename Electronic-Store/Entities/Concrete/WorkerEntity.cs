@@ -28,15 +28,7 @@ namespace Electronic_Store.Entities.Concrete
             _endDate = null;
             ManagedBy = managedBy;
         }
-
-        public WorkerEntity() 
-        {
-            AddWorkerToExtent(this);
-        }
-
-        // -----------------------------
-        //   PROPERTIES
-        // -----------------------------
+        
         public string Name
         {
             get => _name;
