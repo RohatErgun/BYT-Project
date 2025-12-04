@@ -29,8 +29,14 @@ namespace Electronic_Store.Entities.Concrete
             ManagedBy = managedBy;
         }
 
-        public WorkerEntity() { }
+        public WorkerEntity() 
+        {
+            AddWorkerToExtent(this);
+        }
 
+        // -----------------------------
+        //   PROPERTIES
+        // -----------------------------
         public string Name
         {
             get => _name;
@@ -47,13 +53,17 @@ namespace Electronic_Store.Entities.Concrete
         public string Surname
         {
             get => _surname;
-            set => _surname = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Surname cannot be empty.") : value;
+            set => _surname = string.IsNullOrWhiteSpace(value)
+                ? throw new ArgumentException("Surname cannot be empty.")
+                : value;
         }
 
         public string Position
         {
             get => _position;
-            set => _position = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Position cannot be empty.") : value;
+            set => _position = string.IsNullOrWhiteSpace(value)
+                ? throw new ArgumentException("Position cannot be empty.")
+                : value;
         }
 
         public WorkerEntity? ManagedBy
@@ -126,6 +136,7 @@ namespace Electronic_Store.Entities.Concrete
             {
                 if (value > DateTime.Now)
                     throw new ArgumentException("Start date cannot be in the future.");
+
                 _startDate = value;
             }
         }
@@ -137,6 +148,7 @@ namespace Electronic_Store.Entities.Concrete
             {
                 if (value.HasValue && value.Value < StartDate)
                     throw new ArgumentException("End date cannot be before start date.");
+
                 _endDate = value;
             }
         }
@@ -148,10 +160,27 @@ namespace Electronic_Store.Entities.Concrete
             {
                 if (value < 0)
                     throw new ArgumentException("Salary cannot be negative.");
+
                 _salary = value;
             }
         }
+           public void AssignDepartment(DepartmentEntity department)
+        {
+            if (department == null)
+                throw new ArgumentNullException(nameof(department));
 
+            if (DepartmentEntity == department)
+                return;
+
+            if (DepartmentEntity != null)
+            {
+                DepartmentEntity.InternalRemoveWorker(this);
+            }
+
+            DepartmentEntity = department;
+
+            department.InternalAddWorker(this);
+        }
         public void ApplyYearlyPromotion()
         {
             Salary *= (1 + YearlyPromotionRate);
