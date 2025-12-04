@@ -1,15 +1,15 @@
 using Electronic_Store.Entities.Abstract;
+using System.Collections.Generic;
 
 namespace Electronic_Store.Entities.Concrete
 {
-    using System.Collections.Generic;
-    
     [Serializable]
     public class DepartmentEntity : BaseEntity
     {
         private string _address;
         private string _departmentName;
-        private List<WorkerEntity> _workers = new List<WorkerEntity>();
+
+        private HashSet<WorkerEntity> _workers = new HashSet<WorkerEntity>();
 
         public string Address
         {
@@ -27,7 +27,7 @@ namespace Electronic_Store.Entities.Concrete
                 : value;
         }
 
-        public IReadOnlyList<WorkerEntity> Workers => _workers.AsReadOnly();
+        public IReadOnlyCollection<WorkerEntity> Workers => _workers;
 
         public DepartmentEntity(string address, string departmentName)
         {
@@ -36,17 +36,54 @@ namespace Electronic_Store.Entities.Concrete
         }
 
         public DepartmentEntity() { }
-
-        public void AddWorker(WorkerEntity workerEntity)
+        public void AddWorker(WorkerEntity worker)
         {
-            if (workerEntity == null)
-                throw new ArgumentException("Worker cannot be null.");
+            if (worker == null)
+                throw new ArgumentNullException(nameof(worker));
 
-            if (!_workers.Contains(workerEntity))
+            if (_workers.Contains(worker))
+                return;
+
+            if (worker.DepartmentEntity != null && worker.DepartmentEntity != this)
             {
-                _workers.Add(workerEntity);
-                workerEntity.DepartmentEntity = this;
+                worker.DepartmentEntity.InternalRemoveWorker(worker);
             }
+
+            _workers.Add(worker);
+
+            worker.AssignDepartment(this);
+        }
+        public void RemoveWorker(WorkerEntity worker)
+        {
+            if (worker == null)
+                return;
+
+            if (!_workers.Contains(worker))
+                return;
+
+            if (_workers.Count == 1)
+                throw new InvalidOperationException(
+                    "A Department must have at least one Worker (1..* multiplicity)."
+                );
+
+            _workers.Remove(worker);
+
+            worker.RemoveDepartment();
+        }
+        internal void InternalAddWorker(WorkerEntity worker)
+        {
+            if (worker == null)
+                return;
+
+            _workers.Add(worker);
+        }
+
+        internal void InternalRemoveWorker(WorkerEntity worker)
+        {
+            if (worker == null)
+                return;
+
+            _workers.Remove(worker);
         }
     }
 }

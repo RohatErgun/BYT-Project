@@ -17,7 +17,10 @@ namespace Electronic_Store.Entities
         private double _salary;
         private DateTime? _endDate;
 
-        public DepartmentEntity DepartmentEntity { get; internal set; }
+        // Worker MUST belong to exactly 1 Department (1..1 multiplicity)
+        public DepartmentEntity DepartmentEntity { get; private set; }
+
+        // BAG association with Report – left unchanged for now
         public List<ReportEntity> Reports { get; } = new List<ReportEntity>();
 
         public const double YearlyPromotionRate = 0.05;
@@ -30,27 +33,40 @@ namespace Electronic_Store.Entities
             StartDate = startDate;
             Salary = salary;
             _endDate = null;
-            AddWorker(this);
+
+            AddWorkerToExtent(this);
         }
 
-        public WorkerEntity() { }
+        public WorkerEntity() 
+        {
+            AddWorkerToExtent(this);
+        }
 
+        // -----------------------------
+        //   PROPERTIES
+        // -----------------------------
         public string Name
         {
             get => _name;
-            set => _name = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Name cannot be empty.") : value;
+            set => _name = string.IsNullOrWhiteSpace(value)
+                ? throw new ArgumentException("Name cannot be empty.")
+                : value;
         }
 
         public string Surname
         {
             get => _surname;
-            set => _surname = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Surname cannot be empty.") : value;
+            set => _surname = string.IsNullOrWhiteSpace(value)
+                ? throw new ArgumentException("Surname cannot be empty.")
+                : value;
         }
 
         public string Position
         {
             get => _position;
-            set => _position = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Position cannot be empty.") : value;
+            set => _position = string.IsNullOrWhiteSpace(value)
+                ? throw new ArgumentException("Position cannot be empty.")
+                : value;
         }
 
         public DateTime StartDate
@@ -60,6 +76,7 @@ namespace Electronic_Store.Entities
             {
                 if (value > DateTime.Now)
                     throw new ArgumentException("Start date cannot be in the future.");
+
                 _startDate = value;
             }
         }
@@ -71,6 +88,7 @@ namespace Electronic_Store.Entities
             {
                 if (value.HasValue && value.Value < StartDate)
                     throw new ArgumentException("End date cannot be before start date.");
+
                 _endDate = value;
             }
         }
@@ -82,16 +100,37 @@ namespace Electronic_Store.Entities
             {
                 if (value < 0)
                     throw new ArgumentException("Salary cannot be negative.");
+
                 _salary = value;
             }
         }
-
-        private static void AddWorker(WorkerEntity workerEntity)
+        public void AssignDepartment(DepartmentEntity department)
         {
-            if (workerEntity == null)
+            if (department == null)
+                throw new ArgumentNullException(nameof(department));
+
+            if (DepartmentEntity == department)
+                return;
+
+            if (DepartmentEntity != null)
+            {
+                DepartmentEntity.InternalRemoveWorker(this);
+            }
+
+            DepartmentEntity = department;
+
+            department.InternalAddWorker(this);
+        }
+        public void RemoveDepartment()
+        {
+            throw new InvalidOperationException("A Worker must always belong to exactly one Department.");
+        }
+        private static void AddWorkerToExtent(WorkerEntity worker)
+        {
+            if (worker == null)
                 throw new ArgumentException("Worker cannot be null.");
 
-            _workersExtent.Add(workerEntity);
+            _workersExtent.Add(worker);
         }
 
         public static void SaveExtent(string path = "workers.xml")
@@ -120,7 +159,8 @@ namespace Electronic_Store.Entities
 
                 using StreamReader file = File.OpenText(path);
                 XmlSerializer serializer = new XmlSerializer(typeof(List<WorkerEntity>));
-                _workersExtent = (List<WorkerEntity>)serializer.Deserialize(file) ?? new List<WorkerEntity>();
+                _workersExtent = (List<WorkerEntity>)serializer.Deserialize(file)
+                    ?? new List<WorkerEntity>();
             }
             catch
             {
@@ -130,7 +170,6 @@ namespace Electronic_Store.Entities
 
             return true;
         }
-
         public void ApplyYearlyPromotion()
         {
             Salary *= (1 + YearlyPromotionRate);
