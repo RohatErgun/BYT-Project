@@ -1,15 +1,12 @@
-using System.Xml.Serialization;
 using Electronic_Store.Entities.Abstract;
-using Electronic_Store.Entities.Concrete;
 
-namespace Electronic_Store.Entities
+namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
     public class WorkerEntity : BaseEntity
     {
-        private static List<WorkerEntity> _workersExtent = new List<WorkerEntity>();
-        public static IReadOnlyList<WorkerEntity> WorkersExtent => _workersExtent.AsReadOnly();
-
+        private HashSet<WorkerEntity> _workers = new HashSet<WorkerEntity>();
+        
         private string _name;
         private string _surname;
         private string _position;
@@ -18,7 +15,6 @@ namespace Electronic_Store.Entities
         private DateTime? _endDate;
 
         public DepartmentEntity DepartmentEntity { get; internal set; }
-        public List<ReportEntity> Reports { get; } = new List<ReportEntity>();
 
         public const double YearlyPromotionRate = 0.05;
 
@@ -30,7 +26,6 @@ namespace Electronic_Store.Entities
             StartDate = startDate;
             Salary = salary;
             _endDate = null;
-            AddWorker(this);
         }
 
         public WorkerEntity() { }
@@ -84,51 +79,6 @@ namespace Electronic_Store.Entities
                     throw new ArgumentException("Salary cannot be negative.");
                 _salary = value;
             }
-        }
-
-        private static void AddWorker(WorkerEntity workerEntity)
-        {
-            if (workerEntity == null)
-                throw new ArgumentException("Worker cannot be null.");
-
-            _workersExtent.Add(workerEntity);
-        }
-
-        public static void SaveExtent(string path = "workers.xml")
-        {
-            try
-            {
-                using StreamWriter file = File.CreateText(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<WorkerEntity>));
-                serializer.Serialize(file, _workersExtent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error saving workers extent: " + ex.Message);
-            }
-        }
-
-        public static bool LoadExtent(string path = "workers.xml")
-        {
-            try
-            {
-                if (!File.Exists(path))
-                {
-                    _workersExtent.Clear();
-                    return false;
-                }
-
-                using StreamReader file = File.OpenText(path);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<WorkerEntity>));
-                _workersExtent = (List<WorkerEntity>)serializer.Deserialize(file) ?? new List<WorkerEntity>();
-            }
-            catch
-            {
-                _workersExtent.Clear();
-                return false;
-            }
-
-            return true;
         }
 
         public void ApplyYearlyPromotion()
