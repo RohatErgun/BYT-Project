@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
-using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.Association;
 
-namespace Electronic_Store.Entities.Concrete
+namespace Electronic_Store.Entities.Abstract
 {
     [Serializable]
     public abstract class ProductEntity : BaseEntity
@@ -20,6 +16,11 @@ namespace Electronic_Store.Entities.Concrete
         private string _model;
         private string _color;
         private string _material;
+        
+        // Association: List of connections to Warehouses
+        private List<ProductStock> _stocks = new List<ProductStock>();
+        public List<ProductStock> Stocks => _stocks;
+        
 
         // Constructor
         protected ProductEntity(decimal price, string brand, string model, string color, string material)
@@ -38,8 +39,8 @@ namespace Electronic_Store.Entities.Concrete
             _color = color;
             _material = material;
 
-            // Add to class extent
-            AddProduct(this);
+            // Automatically add to extend when ANY child is created
+            _productsExtent.Add(this);
         }
 
         // Properties
@@ -76,50 +77,21 @@ namespace Electronic_Store.Entities.Concrete
             get => _material;
             set => _material = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Material cannot be empty.") : value;
         }
+        
+        // Association Management
+        public void AddStock(ProductStock stock)
+        {
+            if (stock != null && !_stocks.Contains(stock))
+            {
+                _stocks.Add(stock);
+            }
+        }
 
         // Class extent management
         private static void AddProduct(ProductEntity productEntity)
         {
             if (productEntity == null) throw new ArgumentException("Product cannot be null.");
             _productsExtent.Add(productEntity);
-        }
-
-        // Extent persistence
-        public static void SaveExtent(string path = "products.xml")
-        {
-            try
-            {
-                using StreamWriter file = File.CreateText(path);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<ProductEntity>), new Type[] { typeof(ProductEntity) });
-                xmlSerializer.Serialize(file, _productsExtent);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error saving product extent: " + ex.Message);
-            }
-        }
-
-        public static bool LoadExtent(string path = "products.xml")
-        {
-            try
-            {
-                if (!File.Exists(path))
-                {
-                    _productsExtent.Clear();
-                    return false;
-                }
-
-                using StreamReader file = File.OpenText(path);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<ProductEntity>), new Type[] { typeof(ProductEntity) });
-                _productsExtent = (List<ProductEntity>)xmlSerializer.Deserialize(file) ?? new List<ProductEntity>();
-            }
-            catch
-            {
-                _productsExtent.Clear();
-                return false;
-            }
-
-            return true;
         }
     }
 }

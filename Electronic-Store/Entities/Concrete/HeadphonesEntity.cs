@@ -1,9 +1,8 @@
+using System;
 using Electronic_Store.Entities.Abstract;
 
 namespace Electronic_Store.Entities.Concrete
 {
-
-
     [Serializable]
     public class HeadphonesEntity : ElectronicDevice
     {
@@ -21,15 +20,23 @@ namespace Electronic_Store.Entities.Concrete
             get => _type;
             set
             {
-                if (String.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentException("Type cannot be empty");
-                }
+                if (string.IsNullOrEmpty(value)) throw new ArgumentException("Type cannot be empty");
                 _type = value;
             }
-            
         }
-        
-        
+
+        // Constructor
+        public HeadphonesEntity(
+            // ProductEntity params
+            decimal price, string brand, string model, string color, string material,
+            // ElectronicDevice params
+            int batteryLifeHours, int warrantyMonths,
+            // Headphones params
+            bool isWireless, string type)
+            : base(price, brand, model, color, material, batteryLifeHours, warrantyMonths)
+        {
+            IsWireless = isWireless;
+            Type = type;
+        }
     }
 }
