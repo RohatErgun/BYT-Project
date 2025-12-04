@@ -115,7 +115,7 @@ namespace Electronic_Store.Entities.Concrete
 
             if (worker == this)
             {
-                throw new InvalidOperationException($"Worker cannot be managed by himself.");
+                throw new InvalidOperationException("Worker cannot be managed by himself.");
             }
             if (_listOfManagedWorkers.Count >= 5)
             {
@@ -124,10 +124,7 @@ namespace Electronic_Store.Entities.Concrete
 
             if (_listOfManagedWorkers.Add(worker))
             {
-                if (worker._managedBy != null && worker._managedBy != this)
-                {
-                    worker._managedBy = this;
-                }
+               worker.ManagedBy = this;
             }
         }
 

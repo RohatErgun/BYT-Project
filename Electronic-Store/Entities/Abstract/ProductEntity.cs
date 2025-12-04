@@ -1,4 +1,4 @@
-using Electronic_Store.Entities.Association;
+using Electronic_Store.Entities.AssociationClass;
 
 namespace Electronic_Store.Entities.Abstract
 {
