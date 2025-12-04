@@ -22,8 +22,4 @@
         <Using Include="NUnit.Framework"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Entities\AssosiationClasses\" />
-    </ItemGroup>
-
 </Project>
