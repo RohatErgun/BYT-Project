@@ -13,6 +13,7 @@ public class CustomerEntity : BaseEntity
     private string _phoneNumber = null!;
     private DateTime _birthDate;
     private StudentCard? _studentCard;
+    private LoyaltyAccountEntity? _loyaltyAccount;
     
     //Validation checks
     public string Name
@@ -41,7 +42,7 @@ public class CustomerEntity : BaseEntity
         }
     }
 
-    public List<string> Email => new List<string>(_email);
+    public List<string> Email => [.._email];
 
     public void SetEmail(IEnumerable<string> emails)
     {
@@ -140,7 +141,7 @@ public class CustomerEntity : BaseEntity
         }
     }
 
-    public int Age
+    private int Age
     {
         get
         {
@@ -167,9 +168,21 @@ public class CustomerEntity : BaseEntity
             _studentCard = value;
         }
     }
-    
+
+    public LoyaltyAccountEntity? LoyaltyAccount
+    {
+        get => _loyaltyAccount;
+        set
+        {
+            if (value == null)
+            {
+                throw new ArgumentException("Loyalty account cannot be null");
+            }
+            _loyaltyAccount = value;
+        }
+    }
     //Constructor
-    public CustomerEntity(string name, string surname, IEnumerable<string> email, AddressAttribute address, string phoneNumber, DateTime birthDate, StudentCard? studentCard = null)
+    public CustomerEntity(string name, string surname, IEnumerable<string> email, AddressAttribute address, string phoneNumber, DateTime birthDate, StudentCard? studentCard = null, LoyaltyAccountEntity? loyaltyAccount = null)
     {
         Name = name;
         Surname = surname;
@@ -178,5 +191,6 @@ public class CustomerEntity : BaseEntity
         BirthDate = birthDate;
         SetEmail(email);
         StudentCard = studentCard;
+        LoyaltyAccount = loyaltyAccount;
     }
 }
