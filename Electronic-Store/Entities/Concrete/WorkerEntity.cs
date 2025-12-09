@@ -9,15 +9,16 @@ namespace Electronic_Store.Entities.Concrete
         private string _position;
         private DateTime _startDate;
         private double _salary;
-        private WorkerEntity? _managedBy;
-        private HashSet<WorkerEntity> _listOfManagedWorkers = new HashSet<WorkerEntity>();
-        public IReadOnlyCollection<WorkerEntity> ManagedWorkers => _listOfManagedWorkers;
         private DateTime? _endDate;
+        private WorkerEntity? _manager;
+        private readonly HashSet<WorkerEntity> _subordinates = new();
+        public IReadOnlyCollection<WorkerEntity> Subordinates => _subordinates;
         public DepartmentEntity DepartmentEntity { get; private set; }
 
         private const double YearlyPromotionRate = 0.05;
+        private const int MaxSubordinates = 5;
 
-        public WorkerEntity(string name, string surname, string position, DateTime startDate, double salary, WorkerEntity? managedBy)
+        public WorkerEntity(string name, string surname, string position, DateTime startDate, double salary, WorkerEntity? manager)
         {
             Name = name;
             Surname = surname;
@@ -25,10 +26,58 @@ namespace Electronic_Store.Entities.Concrete
             StartDate = startDate;
             Salary = salary;
             _endDate = null;
-            ManagedBy = managedBy;
+            Manager = manager;
         }
 
-        public WorkerEntity() { }
+        public void AssignManager(WorkerEntity manager)
+        {
+            if (manager == null) throw new ArgumentNullException(nameof(manager));
+            if (manager == this) throw new ArgumentException("The worker cannot manage himself.");
+            if (Manager == manager) return;
+            
+            RemoveManager();
+            
+            Manager = manager;
+
+            manager.AddSubordinate(this);
+        }
+
+        public void AddSubordinate(WorkerEntity subordinate)
+        {
+            if (subordinate == null) throw new ArgumentNullException(nameof(subordinate));
+            if (_subordinates.Contains(subordinate)) return;
+            if (_subordinates.Count >= MaxSubordinates) throw new InvalidOperationException($"{Name} cannot have more than {MaxSubordinates} subordinates.");
+            if (subordinate == this) throw new InvalidOperationException("The worker cannot manage himself.");
+            
+            _subordinates.Add(subordinate);
+            
+            subordinate.AssignManager(this);
+        }
+
+        public void RemoveManager()
+        {
+            if (Manager == null) return;
+            var oldManager = Manager;
+            Manager = null;
+
+            if (oldManager._subordinates.Contains(this))
+            {
+                oldManager.RemoveSubordinate(this);
+            }
+        }
+
+        public void RemoveSubordinate(WorkerEntity subordinate)
+        {
+            if (subordinate == null) throw new ArgumentNullException(nameof(subordinate));
+            if (!_subordinates.Contains(subordinate)) return;
+            
+            _subordinates.Remove(subordinate);
+
+            if (subordinate.Manager == this)
+            {
+                subordinate.RemoveManager();
+            }
+        }
         public void AssignDepartment(DepartmentEntity department)
         {
             if (department == null)
@@ -81,67 +130,7 @@ namespace Electronic_Store.Entities.Concrete
                 ? throw new ArgumentException("Position cannot be empty.")
                 : value;
         }
-
-        public WorkerEntity? ManagedBy
-        {
-            get => _managedBy;
-            set
-            {
-                if (_managedBy == value) return;
-
-                _managedBy?._listOfManagedWorkers.Remove(this);
-
-                if (value != null && value._listOfManagedWorkers.Count > 5)
-                {
-                    throw new InvalidOperationException($"{value.Name} cannot manage more than 5 workers.");
-                }
-
-                _managedBy = value;
-
-                if (_managedBy != null && !_managedBy._listOfManagedWorkers.Contains(this))
-                {
-                    _managedBy._listOfManagedWorkers.Add(this);
-                }
-            }
-        }
-
-        public void AddManagedWorker(WorkerEntity worker)
-        {
-            if (worker == null)
-            {
-                throw new ArgumentNullException(nameof(worker));
-            }
-
-            if (worker == this)
-            {
-                throw new InvalidOperationException("Worker cannot be managed by himself.");
-            }
-            if (_listOfManagedWorkers.Count > 5)
-            {
-                throw new InvalidOperationException($"{Name} cannot manage more than 5 workers.");
-            }
-
-            if (_listOfManagedWorkers.Add(worker))
-            {
-               worker.ManagedBy = this;
-            }
-        }
-
-        public void RemoveManagedWorker(WorkerEntity worker)
-        {
-            if (worker == null)
-            {
-                throw new ArgumentNullException(nameof(worker));
-            }
-
-            if (_listOfManagedWorkers.Remove(worker))
-            {
-                if (worker._managedBy == this)
-                {
-                    worker._managedBy = null;
-                }
-            }
-        }
+        
         public DateTime StartDate
         {
             get => _startDate;
@@ -177,6 +166,25 @@ namespace Electronic_Store.Entities.Concrete
             }
         }
 
+        public WorkerEntity? Manager
+        {
+            get => _manager;
+            set
+            {
+                if(value == _manager) return;
+                if(value == this) throw new ArgumentException("The manager cannot manage himself.");
+                
+                _manager?.RemoveSubordinate(this);
+                
+                _manager = value;
+
+                if (_manager != null && !_manager._subordinates.Contains(this))
+                {
+                    _manager.AddSubordinate(this);
+                }
+                
+            }
+        }
         public void ApplyYearlyPromotion()
         {
             Salary *= (1 + YearlyPromotionRate);
