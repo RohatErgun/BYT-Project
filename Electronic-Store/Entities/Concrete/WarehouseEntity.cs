@@ -27,36 +27,10 @@ public class WarehouseEntity : BaseEntity
     {
         Address = address;
     }
-
-    
-    public void AddStock(ProductStock stock)
-    {
-        if (stock == null) return;
-
-        string key = BuildQualifier(stock.Product);
-
-        if (_qualifiedAssociation.TryGetValue(key, out var existing))
-        {
-            if (existing != stock)
-            {
-                throw new InvalidOperationException("Product with same brand,model,color and material already exists");
-            }
-        }
-
-        if (existing != null && existing != stock)
-            throw new InvalidOperationException("Product with these qualifiers already exists in this warehouse.");
-
-        if (!_inventory.Contains(stock))
-        {
-            _inventory.Add(stock);
-        }
-    }
-    
-    
     
     // Qualified - Ass on; Product Values : brand, model, color, material
     // 
-    private Dictionary<string, ProductStock> _qualifiedAssociation = new Dictionary<string, ProductStock>();
+    private Dictionary<string, ProductStock> _qualifiedInventory= new Dictionary<string, ProductStock>();
 
     // Keys
     private string BuildQualifier(ProductEntity product)
@@ -65,6 +39,44 @@ public class WarehouseEntity : BaseEntity
                $"{product.Model.ToLowerInvariant()}|" +
                $"{product.Color.ToLowerInvariant()}|" +
                $"{product.Material.ToLowerInvariant()}";
+    }
+    
+    private string BuildQualifier(string brand, string model, string color, string material)
+    {
+        return $"{brand.ToLowerInvariant()}|" +
+               $"{model.ToLowerInvariant()}|" +
+               $"{color.ToLowerInvariant()}|" +
+               $"{material.ToLowerInvariant()}";
+    }
+    
+    public void AddStock(ProductStock stock)
+    {
+        if (stock == null) return;
+
+        string key = BuildQualifier(stock.Product);
+
+        if (_qualifiedInventory.TryGetValue(key, out var existing))
+        {
+            if (existing != stock)
+            {
+                throw new InvalidOperationException("Product with same brand,model,color and material already exists");
+            }
+        }
+        else
+        {
+            _qualifiedInventory[key] = stock;
+            _inventory.Add(stock);
+        }
+    }
+
+    public ProductStock? GetStockByQualifiers(string brand, string model, string color, string material)
+    {
+        string key = BuildQualifier(brand, model, color, material);
+
+        return _qualifiedInventory.TryGetValue(key, out var stock)
+            ? stock
+            : null;
+        
     }
     
 }
