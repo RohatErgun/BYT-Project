@@ -9,7 +9,7 @@ public class WarehouseEntity : BaseEntity
 {
     private AddressAttribute _address = null!;
     
-    private List<ProductStock> _inventory = new List<ProductStock>();
+    private List<ProductStock> _inventory = new();
     public List<ProductStock> Inventory => _inventory;
 
     public AddressAttribute Address
@@ -32,10 +32,16 @@ public class WarehouseEntity : BaseEntity
     public void AddStock(ProductStock stock)
     {
         if (stock == null) return;
-            
-        var existing = GetStockByQualifiers(
-            stock.Product.Brand, stock.Product.Model, 
-            stock.Product.Color, stock.Product.Material);
+
+        string key = BuildQualifier(stock.Product);
+
+        if (_qualifiedAssociation.TryGetValue(key, out var existing))
+        {
+            if (existing != stock)
+            {
+                throw new InvalidOperationException("Product with same brand,model,color and material already exists");
+            }
+        }
 
         if (existing != null && existing != stock)
             throw new InvalidOperationException("Product with these qualifiers already exists in this warehouse.");
@@ -46,15 +52,6 @@ public class WarehouseEntity : BaseEntity
         }
     }
     
-    public ProductStock? GetStockByQualifiers(string brand, string model, string color, string material)
-    {
-        return _inventory.FirstOrDefault(s => 
-            s.Product.Brand.Equals(brand, StringComparison.OrdinalIgnoreCase) &&
-            s.Product.Model.Equals(model, StringComparison.OrdinalIgnoreCase) &&
-            s.Product.Color.Equals(color, StringComparison.OrdinalIgnoreCase) &&
-            s.Product.Material.Equals(material, StringComparison.OrdinalIgnoreCase)
-        );
-    }
     
     
     // Qualified - Ass on; Product Values : brand, model, color, material
@@ -69,5 +66,5 @@ public class WarehouseEntity : BaseEntity
                $"{product.Color.ToLowerInvariant()}|" +
                $"{product.Material.ToLowerInvariant()}";
     }
-
+    
 }
