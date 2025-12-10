@@ -55,4 +55,19 @@ public class WarehouseEntity : BaseEntity
             s.Product.Material.Equals(material, StringComparison.OrdinalIgnoreCase)
         );
     }
+    
+    
+    // Qualified - Ass on; Product Values : brand, model, color, material
+    // 
+    private Dictionary<string, ProductStock> _qualifiedAssociation = new Dictionary<string, ProductStock>();
+
+    // Keys
+    private string BuildQualifier(ProductEntity product)
+    {
+        return $"{product.Brand.ToLowerInvariant()}|" +
+               $"{product.Model.ToLowerInvariant()}|" +
+               $"{product.Color.ToLowerInvariant()}|" +
+               $"{product.Material.ToLowerInvariant()}";
+    }
+
 }
