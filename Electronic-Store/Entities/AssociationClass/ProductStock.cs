@@ -2,6 +2,11 @@ using System;
 using Electronic_Store.Entities.Abstract;
 using Electronic_Store.Entities.Concrete;
 
+
+// ProductStock Represent the Quantity Association between Classes Warehouse and Product(abs)
+
+
+
 namespace Electronic_Store.Entities.AssociationClass
 {
     public class ProductStock
