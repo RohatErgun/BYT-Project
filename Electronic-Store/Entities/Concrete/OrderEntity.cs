@@ -78,13 +78,13 @@ namespace Electronic_Store.Entities.Concrete
             set => _paymentMethod = value;
         }
         
-        private List<OrderLine> _orderLines = new List<OrderLine>();
-        public ReadOnlyCollection<OrderLine> OrderLines => _orderLines.AsReadOnly();
-        
         private decimal _finalPrice;
         public decimal FinalPrice => _finalPrice;
         
-
+        // association order to product
+        private List<OrderLine> _orderLines = new List<OrderLine>();
+        public ReadOnlyCollection<OrderLine> OrderLines => _orderLines.AsReadOnly();
+        
         public void AddOrderLine(OrderLine line)
         {
             if (line == null) throw new ArgumentNullException(nameof(line));
@@ -94,6 +94,18 @@ namespace Electronic_Store.Entities.Concrete
                 _orderLines.Add(line);
                 
                 _finalPrice += line.GetSubTotal();
+            }
+        }
+        
+        // association order to customer Review
+        private List<ReviewEntity> _reviews = new List<ReviewEntity>(); 
+        public ReadOnlyCollection<ReviewEntity> Reviews => _reviews.AsReadOnly();
+        
+        public void AddReview(ReviewEntity review)
+        {
+            if (review != null && !_reviews.Contains(review))
+            {
+                _reviews.Add(review);
             }
         }
 
