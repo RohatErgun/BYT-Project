@@ -62,6 +62,20 @@ namespace Electronic_Store.Entities.Concrete
             get => _status;
             set => _status = value;
         }
+        
+        public enum PaymentMethodType
+        {
+            BLIK,
+            DebitCard,
+            PayPal
+        }
+
+        private PaymentMethodType _paymentMethod;
+        public PaymentMethodType PaymentMethod
+        {
+            get => _paymentMethod;
+            set => _paymentMethod = value;
+        }
 
         private double _finalPrice;
         public double FinalPrice => _finalPrice;
@@ -83,11 +97,12 @@ namespace Electronic_Store.Entities.Concrete
             _finalPrice += (double)p.Price;
         }
 
-        public OrderEntity(int id, DateTime date, OrderStatus status)
+        public OrderEntity(int id, DateTime date, OrderStatus status, PaymentMethodType paymentMethod)
         {
             Id = id;
             Date = date;
             Status = status;
+            PaymentMethod = paymentMethod;
 
             AddToExtent(this);
         }
