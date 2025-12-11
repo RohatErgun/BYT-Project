@@ -21,6 +21,9 @@ namespace Electronic_Store.Entities.Abstract
         private List<ProductStock> _stocks = new List<ProductStock>();
         public List<ProductStock> Stocks => _stocks;
         
+        // Association: List of connections to Order
+        private List<OrderLine> _orderLines = new List<OrderLine>();
+        public IReadOnlyList<OrderLine> OrderLines => _orderLines.AsReadOnly();
 
         // Constructor
         protected ProductEntity(decimal price, string brand, string model, string color, string material)
@@ -78,7 +81,7 @@ namespace Electronic_Store.Entities.Abstract
             set => _material = string.IsNullOrWhiteSpace(value) ? throw new ArgumentException("Material cannot be empty.") : value;
         }
         
-        // Association Management
+        // Association Warehouse
         public void AddStock(ProductStock stock)
         {
             if (stock != null && !_stocks.Contains(stock))
@@ -86,12 +89,14 @@ namespace Electronic_Store.Entities.Abstract
                 _stocks.Add(stock);
             }
         }
-
-        // Class extent management
-        private static void AddProduct(ProductEntity productEntity)
+        
+        // Association Order
+        public void AddOrderLine(OrderLine line)
         {
-            if (productEntity == null) throw new ArgumentException("Product cannot be null.");
-            _productsExtent.Add(productEntity);
+            if (line != null && !_orderLines.Contains(line))
+            {
+                _orderLines.Add(line);
+            }
         }
     }
 }

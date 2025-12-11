@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.AssociationClass;
 
 namespace Electronic_Store.Entities.Concrete
 {
@@ -76,25 +77,24 @@ namespace Electronic_Store.Entities.Concrete
             get => _paymentMethod;
             set => _paymentMethod = value;
         }
+        
+        private List<OrderLine> _orderLines = new List<OrderLine>();
+        public ReadOnlyCollection<OrderLine> OrderLines => _orderLines.AsReadOnly();
+        
+        private decimal _finalPrice;
+        public decimal FinalPrice => _finalPrice;
+        
 
-        private double _finalPrice;
-        public double FinalPrice => _finalPrice;
-
-        private List<ProductEntity> _products = new List<ProductEntity>();
-
-        public ReadOnlyCollection<ProductEntity> Products
+        public void AddOrderLine(OrderLine line)
         {
-            get => _products.AsReadOnly();
-        }
-
-        public void AddProduct(ProductEntity p)
-        {
-            if (p == null)
-                throw new ArgumentException("Product cannot be null");
-
-            _products.Add(p);
-
-            _finalPrice += (double)p.Price;
+            if (line == null) throw new ArgumentNullException(nameof(line));
+            
+            if (!_orderLines.Contains(line))
+            {
+                _orderLines.Add(line);
+                
+                _finalPrice += line.GetSubTotal();
+            }
         }
 
         public OrderEntity(int id, DateTime date, OrderStatus status, PaymentMethodType paymentMethod)
