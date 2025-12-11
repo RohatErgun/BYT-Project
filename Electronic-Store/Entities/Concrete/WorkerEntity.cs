@@ -1,4 +1,5 @@
 using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.AssociationClass;
 
 namespace Electronic_Store.Entities.Concrete
 { 
@@ -195,5 +196,24 @@ namespace Electronic_Store.Entities.Concrete
             var end = EndDate ?? DateTime.Now;
             return end - StartDate;
         }
+        private readonly List<ReportEntity> _reports = new(); 
+        public IReadOnlyList<ReportEntity> Reports => _reports.AsReadOnly();
+        
+        public void AddReport(ReportEntity report)
+        {
+            if (report == null) 
+                throw new ArgumentNullException(nameof(report));
+            if (! _reports.Contains(report))
+                _reports.Add(report);
+        }
+
+        public void RemoveReport(ReportEntity report)
+        {
+            if (report == null)
+                throw new ArgumentNullException(nameof(report));
+
+            _reports.Remove(report);
+        }
+        
     }
 }

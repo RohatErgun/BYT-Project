@@ -1,4 +1,5 @@
 using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.Concrete;
 
 namespace Electronic_Store.Entities.AssociationClass
 {
@@ -10,6 +11,9 @@ namespace Electronic_Store.Entities.AssociationClass
         private string _managerName;
         private string _workerName;
         private string _title;
+        
+        public WorkerEntity Worker { get; private set; }
+        
 
         public DateTime IssuedDate
         {
@@ -41,14 +45,16 @@ namespace Electronic_Store.Entities.AssociationClass
                 : value;
         }
 
-        public ReportEntity(string managerName, string workerName, string title)
+        public ReportEntity(WorkerEntity worker, string managerName, string title)
         {
+            Worker = worker ?? throw new ArgumentNullException(nameof(worker));
             ManagerName = managerName;
-            WorkerName = workerName;
+            WorkerName = worker.Name + " " + worker.Surname;
             Title = title;
             IssuedDate = DateTime.Now;
+            worker.AddReport(this);
         }
-
+        
         public ReportEntity() { }
 
         public void GenerateReport() { }
