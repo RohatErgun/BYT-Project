@@ -8,7 +8,7 @@ namespace Electronic_Store.Entities.Concrete
         private string _address;
         private string _departmentName;
 
-        private HashSet<WorkerEntity> _workers = new HashSet<WorkerEntity>();
+        private readonly HashSet<WorkerEntity> _workers = new();
 
         public string Address
         {
@@ -26,7 +26,7 @@ namespace Electronic_Store.Entities.Concrete
                 : value;
         }
 
-        public IReadOnlyCollection<WorkerEntity> Workers => _workers.ToList();
+        public IReadOnlyCollection<WorkerEntity> Workers => _workers;
 
         public DepartmentEntity(string address, string departmentName)
         {
@@ -36,23 +36,26 @@ namespace Electronic_Store.Entities.Concrete
 
         public DepartmentEntity() { }
 
+        // ------------------------
+        // 🔥 REVERSE ASSOCIATION FIXED (Hocanın istediği şekil)
+        // ------------------------
         public void AddWorker(WorkerEntity worker)
         {
             if (worker == null)
                 throw new ArgumentNullException(nameof(worker));
 
+            // EXIT GUARD
             if (_workers.Contains(worker))
                 return;
 
-            if (worker.DepartmentEntity != null && worker.DepartmentEntity != this)
-            {
-                worker.DepartmentEntity.InternalRemoveWorker(worker);
-            }
-
+            // add to list
             _workers.Add(worker);
 
+            // reverse update (public → public)
             if (worker.DepartmentEntity != this)
+            {
                 worker.AssignDepartment(this);
+            }
         }
 
         public void RemoveWorker(WorkerEntity worker)
@@ -63,10 +66,9 @@ namespace Electronic_Store.Entities.Concrete
             if (!_workers.Contains(worker))
                 return;
 
+            // UML: 1..* → at least one worker required
             if (_workers.Count == 1)
-                throw new InvalidOperationException(
-                    "A Department must have at least one Worker."
-                );
+                throw new InvalidOperationException("A Department must have at least one Worker.");
 
             _workers.Remove(worker);
 
@@ -74,18 +76,6 @@ namespace Electronic_Store.Entities.Concrete
             {
                 worker.RemoveDepartment();
             }
-        }
-
-        internal void InternalAddWorker(WorkerEntity worker)
-        {
-            if (worker != null)
-                _workers.Add(worker);
-        }
-
-        internal void InternalRemoveWorker(WorkerEntity worker)
-        {
-            if (worker != null)
-                _workers.Remove(worker);
         }
     }
 }

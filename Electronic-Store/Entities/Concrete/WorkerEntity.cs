@@ -13,7 +13,10 @@ namespace Electronic_Store.Entities.Concrete
         private DateTime? _endDate;
         private WorkerEntity? _manager;
         private readonly HashSet<WorkerEntity> _subordinates = new();
+
         public IReadOnlyCollection<WorkerEntity> Subordinates => _subordinates;
+
+        // UML: Worker → Department = 1 (Worker must belong to exactly 1 department)
         public DepartmentEntity DepartmentEntity { get; private set; }
 
         private const double YearlyPromotionRate = 0.05;
@@ -30,16 +33,54 @@ namespace Electronic_Store.Entities.Concrete
             Manager = manager;
         }
 
+        // ------------------------
+        // 🔥 REVERSE ASSOCIATION FIXED (Hocanın istediği şekil)
+        // ------------------------
+        public void AssignDepartment(DepartmentEntity newDepartment)
+        {
+            if (newDepartment == null)
+                throw new ArgumentNullException(nameof(newDepartment));
+
+            // EXIT GUARD — prevents infinite loop
+            if (DepartmentEntity == newDepartment)
+                return;
+
+            var oldDepartment = DepartmentEntity;
+
+            // update reference
+            DepartmentEntity = newDepartment;
+
+            // remove from old
+            if (oldDepartment != null && oldDepartment.Workers.Contains(this))
+            {
+                oldDepartment.RemoveWorker(this);
+            }
+
+            // reverse connection (public → public)
+            if (!newDepartment.Workers.Contains(this))
+            {
+                newDepartment.AddWorker(this);
+            }
+        }
+
+        public void RemoveDepartment()
+        {
+            // Worker cannot remove its own department — Department controls relation
+            DepartmentEntity = null;
+        }
+
+        // ------------------------
+        // Other Worker logic stays the same
+        // ------------------------
+
         public void AssignManager(WorkerEntity manager)
         {
             if (manager == null) throw new ArgumentNullException(nameof(manager));
             if (manager == this) throw new ArgumentException("The worker cannot manage himself.");
             if (Manager == manager) return;
-            
-            RemoveManager();
-            
-            Manager = manager;
 
+            RemoveManager();
+            Manager = manager;
             manager.AddSubordinate(this);
         }
 
@@ -49,9 +90,8 @@ namespace Electronic_Store.Entities.Concrete
             if (_subordinates.Contains(subordinate)) return;
             if (_subordinates.Count >= MaxSubordinates) throw new InvalidOperationException($"{Name} cannot have more than {MaxSubordinates} subordinates.");
             if (subordinate == this) throw new InvalidOperationException("The worker cannot manage himself.");
-            
+
             _subordinates.Add(subordinate);
-            
             subordinate.AssignManager(this);
         }
 
@@ -71,7 +111,7 @@ namespace Electronic_Store.Entities.Concrete
         {
             if (subordinate == null) throw new ArgumentNullException(nameof(subordinate));
             if (!_subordinates.Contains(subordinate)) return;
-            
+
             _subordinates.Remove(subordinate);
 
             if (subordinate.Manager == this)
@@ -79,41 +119,13 @@ namespace Electronic_Store.Entities.Concrete
                 subordinate.RemoveManager();
             }
         }
-        public void AssignDepartment(DepartmentEntity department)
-        {
-            if (department == null)
-                throw new ArgumentNullException(nameof(department));
 
-            if (DepartmentEntity == department)
-                return;
-
-            if (DepartmentEntity != null)
-            {
-                DepartmentEntity.InternalRemoveWorker(this);
-            }
-
-            DepartmentEntity = department;
-
-            department.InternalAddWorker(this);
-        }
-
-        public void RemoveDepartment()
-        {
-            throw new InvalidOperationException(
-                "Worker cannot remove its own Department. This action must be done by Department."
-            );
-        }
         public string Name
         {
             get => _name;
-            set
-            {
-                if (String.IsNullOrEmpty(value))
-                {
-                    throw new ArgumentException("Name cannot be empty");
-                }
-                _name = value;
-            }
+            set => _name = string.IsNullOrWhiteSpace(value)
+                ? throw new ArgumentException("Name cannot be empty.")
+                : value;
         }
 
         public string Surname
@@ -131,7 +143,7 @@ namespace Electronic_Store.Entities.Concrete
                 ? throw new ArgumentException("Position cannot be empty.")
                 : value;
         }
-        
+
         public DateTime StartDate
         {
             get => _startDate;
@@ -172,20 +184,20 @@ namespace Electronic_Store.Entities.Concrete
             get => _manager;
             set
             {
-                if(value == _manager) return;
-                if(value == this) throw new ArgumentException("The manager cannot manage himself.");
-                
+                if (value == _manager) return;
+                if (value == this) throw new ArgumentException("The manager cannot manage himself.");
+
                 _manager?.RemoveSubordinate(this);
-                
+
                 _manager = value;
 
                 if (_manager != null && !_manager._subordinates.Contains(this))
                 {
                     _manager.AddSubordinate(this);
                 }
-                
             }
         }
+
         public void ApplyYearlyPromotion()
         {
             Salary *= (1 + YearlyPromotionRate);
