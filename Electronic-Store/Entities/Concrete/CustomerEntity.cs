@@ -1,4 +1,5 @@
 using Electronic_Store.Entities.Abstract;
+using Electronic_Store.Entities.AssociationClass;
 using Electronic_Store.Entities.ComplexAttributes;
 
 namespace Electronic_Store.Entities.Concrete;
@@ -14,6 +15,11 @@ public class CustomerEntity : BaseEntity
     private DateTime _birthDate;
     private StudentCard? _studentCard;
     private LoyaltyAccountEntity? _loyaltyAccount;
+    
+    
+    //Association Reviews
+    private List<ReviewEntity> _reviews = new List<ReviewEntity>();
+    public IReadOnlyList<ReviewEntity> Reviews => _reviews.AsReadOnly();
     
     //Validation checks
     public string Name
@@ -192,5 +198,14 @@ public class CustomerEntity : BaseEntity
         SetEmail(email);
         StudentCard = studentCard;
         LoyaltyAccount = loyaltyAccount;
+    }
+    
+    // Association review
+    public void AddReview(ReviewEntity review)
+    {
+        if (review != null && !_reviews.Contains(review))
+        {
+            _reviews.Add(review);
+        }
     }
 }
