@@ -1,43 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 using Electronic_Store.Entities.Abstract;
 using Electronic_Store.Entities.AssociationClass;
 
 namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
-    public class OrderEntity
+    public class OrderEntity : BaseEntity
     {
-        private static List<OrderEntity> _orders = new List<OrderEntity>();
-
-        public static ReadOnlyCollection<OrderEntity> GetExtent()
-        {
-            return _orders.AsReadOnly();
-        }
-
-        private static void AddToExtent(OrderEntity orderEntity)
-        {
-            if (orderEntity == null)
-                throw new ArgumentException("Order cannot be null");
-
-            _orders.Add(orderEntity);
-        }
-
-        private int _id;
-        public int Id
-        {
-            get => _id;
-            set
-            {
-                if (value <= 0)
-                    throw new ArgumentException("Id must be greater than 0");
-                _id = value;
-            }
-        }
 
         private DateTime _date;
         public DateTime Date
@@ -109,56 +78,35 @@ namespace Electronic_Store.Entities.Concrete
             }
         }
 
-        public OrderEntity(int id, DateTime date, OrderStatus status, PaymentMethodType paymentMethod)
+        public OrderEntity(DateTime date, OrderStatus status, PaymentMethodType paymentMethod)
         {
-            Id = id;
             Date = date;
             Status = status;
             PaymentMethod = paymentMethod;
+        }
+        
+        
+        public CustomerEntity? Customer { get; set; }
 
-            AddToExtent(this);
+        public void AssignCustomer(CustomerEntity customer)
+        {
+            if (customer == null) throw new ArgumentNullException(nameof(customer));
+
+            if (Customer == customer) return;
+            
+            Customer = customer;
+            
+            if(!customer.Orders.Contains(this)) customer.AddOrder(this);
         }
 
-        private OrderEntity() { }
-
-        public static void Save(string path = "orders.xml")
+        public void RemoveCustomer()
         {
-            try
-            {
-                using (StreamWriter file = File.CreateText(path))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<OrderEntity>));
-                    using (XmlTextWriter writer = new XmlTextWriter(file))
-                    {
-                        serializer.Serialize(writer, _orders);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error saving extent: " + e.Message);
-            }
-        }
-
-        public static bool Load(string path = "orders.xml")
-        {
-            try
-            {
-                using (StreamReader file = File.OpenText(path))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<OrderEntity>));
-                    using (XmlTextReader reader = new XmlTextReader(file))
-                    {
-                        _orders = (List<OrderEntity>)serializer.Deserialize(reader);
-                    }
-                }
-            }
-            catch
-            {
-                _orders.Clear();
-                return false;
-            }
-            return true;
+            if (Customer == null) return;
+            
+            var oldCustomer = Customer;
+            Customer = null;
+            
+            if(oldCustomer.Orders.Contains(this)) oldCustomer.RemoveOrder(this);
         }
     }
 }

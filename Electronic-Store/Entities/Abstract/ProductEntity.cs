@@ -6,11 +6,11 @@ namespace Electronic_Store.Entities.Abstract
     [Serializable]
     public abstract class ProductEntity : BaseEntity
     {
-        
+
         private static List<ProductEntity> _productsExtent = new List<ProductEntity>();
         public static IReadOnlyList<ProductEntity> ProductsExtent => _productsExtent.AsReadOnly();
 
-        
+
         private decimal _price;
         private string _brand;
         private string _model;
@@ -18,7 +18,7 @@ namespace Electronic_Store.Entities.Abstract
         private string _material;
 
 
-      
+
         // PRODUCT - WAREHOUSE
         private List<ProductStock> _stocks = new List<ProductStock>();
         public List<ProductStock> Stocks => _stocks;
@@ -49,7 +49,7 @@ namespace Electronic_Store.Entities.Abstract
 
             _productsExtent.Add(this);
         }
-        
+
         public decimal Price
         {
             get => _price;
@@ -139,6 +139,44 @@ namespace Electronic_Store.Entities.Abstract
 
             if (oldPromotion != null && oldPromotion.Products.Contains(this))
                 oldPromotion.RemoveProduct(this);
+        }
+
+        public WorkerEntity? AddedBy { get; set; }
+
+        public void AssignWorker(WorkerEntity worker)
+        {
+            if (worker == null)
+            {
+                throw new ArgumentNullException(nameof(worker));
+            }
+
+            if (AddedBy == worker)
+            {
+                return;
+            }
+            
+            AddedBy = worker;
+
+            if (!worker.Products.Contains(this))
+            {
+                worker.AddProduct(this);
+            }
+        }
+
+        public void ReassignWorker()
+        {
+            if (AddedBy == null)
+            {
+                return;
+            }
+            
+            var oldWorker = AddedBy;
+            AddedBy = null;
+
+            if (oldWorker.Products.Contains(this))
+            {
+                oldWorker.RemoveProduct(this);
+            }
         }
     }
 }

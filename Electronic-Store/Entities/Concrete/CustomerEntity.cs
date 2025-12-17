@@ -16,11 +16,6 @@ public class CustomerEntity : BaseEntity
     private StudentCard? _studentCard;
     private LoyaltyAccountEntity? _loyaltyAccount;
     
-    
-    //Association Reviews
-    private List<ReviewEntity> _reviews = new List<ReviewEntity>();
-    public IReadOnlyList<ReviewEntity> Reviews => _reviews.AsReadOnly();
-    
     //Validation checks
     public string Name
     {
@@ -178,14 +173,7 @@ public class CustomerEntity : BaseEntity
     public LoyaltyAccountEntity? LoyaltyAccount
     {
         get => _loyaltyAccount;
-        set
-        {
-            if (value == null)
-            {
-                throw new ArgumentException("Loyalty account cannot be null");
-            }
-            _loyaltyAccount = value;
-        }
+        set => _loyaltyAccount = value;
     }
     //Constructor
     public CustomerEntity(string name, string surname, IEnumerable<string> email, AddressAttribute address, string phoneNumber, DateTime birthDate, StudentCard? studentCard = null, LoyaltyAccountEntity? loyaltyAccount = null)
@@ -200,12 +188,55 @@ public class CustomerEntity : BaseEntity
         LoyaltyAccount = loyaltyAccount;
     }
     
+    //Association Reviews
+    private List<ReviewEntity> _reviews = new List<ReviewEntity>();
+    public IReadOnlyList<ReviewEntity> Reviews => _reviews.AsReadOnly();
+    
     // Association review
     public void AddReview(ReviewEntity review)
     {
         if (review != null && !_reviews.Contains(review))
         {
             _reviews.Add(review);
+        }
+    }
+    
+    private HashSet<OrderEntity> _orders = new();
+    public IReadOnlyCollection<OrderEntity> Orders => _orders;
+
+    public void AddOrder(OrderEntity order)
+    {
+        if (order == null)
+        {
+            throw new ArgumentNullException(nameof(order));
+        }
+
+        if (_orders.Contains(order))
+        {
+            return;
+        }
+        
+        _orders.Add(order);
+
+        if (order.Customer != this)
+        {
+            order.AssignCustomer(this);
+        }
+    }
+
+    public void RemoveOrder(OrderEntity order)
+    {
+        if (order == null ) throw new ArgumentNullException(nameof(order));
+
+        if (!_orders.Contains(order))
+        {
+            return;
+        }
+        _orders.Remove(order);
+
+        if (order.Customer == this)
+        {
+            order.RemoveCustomer();
         }
     }
 }
