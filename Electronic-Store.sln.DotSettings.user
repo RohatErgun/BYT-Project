@@ -4,5 +4,8 @@
     &lt;ProjectFile&gt;C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD/d:AssociationTests/f:WorkerDepAssociationTests.cs&lt;/ProjectFile&gt;
     &lt;ProjectFile&gt;C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD/d:AssociationTests/f:WorkerReflexiveAssociationTest.cs&lt;/ProjectFile&gt;
     &lt;ProjectFile&gt;C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD/d:AssociationTests/f:PromotionProductAssociationTests.cs&lt;/ProjectFile&gt;
+    &lt;TestAncestor&gt;
+      &lt;TestId&gt;NUnit3x::C27488C2-D8D4-4E42-8FB0-FD36CAAA4AFD::net8.0::ElectronicStore.Tests.AssociationTests.WorkerProductAssociationTests&lt;/TestId&gt;
+    &lt;/TestAncestor&gt;
   &lt;/Or&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

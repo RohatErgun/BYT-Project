@@ -254,7 +254,7 @@ namespace Electronic_Store.Entities.Concrete
             
             _products.Remove(product);
 
-            if (product.AddedBy != this)
+            if (product.AddedBy == this)
             {
                 product.ReassignWorker();
             }
