@@ -1,23 +1,12 @@
 using System.Collections.ObjectModel;
+using Electronic_Store.Entities.Abstract;
 using Electronic_Store.Entities.AssociationClass;
 
 namespace Electronic_Store.Entities.Concrete
 {
     [Serializable]
-    public class OrderEntity
+    public class OrderEntity : BaseEntity
     {
-        
-        private int _id;
-        public int Id
-        {
-            get => _id;
-            set
-            {
-                if (value <= 0)
-                    throw new ArgumentException("Id must be greater than 0");
-                _id = value;
-            }
-        }
 
         private DateTime _date;
         public DateTime Date
@@ -89,9 +78,8 @@ namespace Electronic_Store.Entities.Concrete
             }
         }
 
-        public OrderEntity(int id, DateTime date, OrderStatus status, PaymentMethodType paymentMethod)
+        public OrderEntity(DateTime date, OrderStatus status, PaymentMethodType paymentMethod)
         {
-            Id = id;
             Date = date;
             Status = status;
             PaymentMethod = paymentMethod;

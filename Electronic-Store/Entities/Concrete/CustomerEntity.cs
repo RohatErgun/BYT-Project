@@ -173,14 +173,7 @@ public class CustomerEntity : BaseEntity
     public LoyaltyAccountEntity? LoyaltyAccount
     {
         get => _loyaltyAccount;
-        set
-        {
-            if (value == null)
-            {
-                throw new ArgumentException("Loyalty account cannot be null");
-            }
-            _loyaltyAccount = value;
-        }
+        set => _loyaltyAccount = value;
     }
     //Constructor
     public CustomerEntity(string name, string surname, IEnumerable<string> email, AddressAttribute address, string phoneNumber, DateTime birthDate, StudentCard? studentCard = null, LoyaltyAccountEntity? loyaltyAccount = null)
