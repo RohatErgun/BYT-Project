@@ -16,7 +16,6 @@ namespace Electronic_Store.Entities.Concrete
 
         public IReadOnlyCollection<WorkerEntity> Subordinates => _subordinates;
 
-        // UML: Worker → Department = 1 (Worker must belong to exactly 1 department)
         public DepartmentEntity DepartmentEntity { get; private set; }
 
         private const double YearlyPromotionRate = 0.05;
@@ -32,10 +31,7 @@ namespace Electronic_Store.Entities.Concrete
             _endDate = null;
             Manager = manager;
         }
-
-        // ------------------------
-        // 🔥 REVERSE ASSOCIATION FIXED (Hocanın istediği şekil)
-        // ------------------------
+        
         public void AssignDepartment(DepartmentEntity newDepartment)
         {
             if (newDepartment == null)
@@ -65,13 +61,8 @@ namespace Electronic_Store.Entities.Concrete
 
         public void RemoveDepartment()
         {
-            // Worker cannot remove its own department — Department controls relation
             DepartmentEntity = null;
         }
-
-        // ------------------------
-        // Other Worker logic stays the same
-        // ------------------------
 
         public void AssignManager(WorkerEntity manager)
         {
@@ -225,6 +216,48 @@ namespace Electronic_Store.Entities.Concrete
                 throw new ArgumentNullException(nameof(report));
 
             _reports.Remove(report);
+        }
+        
+        private readonly HashSet<ProductEntity> _products = new();
+        public IReadOnlyCollection<ProductEntity> Products => _products;
+
+        public void AddProduct(ProductEntity product)
+        {
+            if (product == null)
+            {
+                throw new ArgumentNullException(nameof(product));
+            }
+
+            if (_products.Contains(product))
+            {
+                return;
+            }
+            _products.Add(product);
+
+            if (product.AddedBy != this)
+            {
+                product.AssignWorker(this);
+            }
+        }
+
+        public void RemoveProduct(ProductEntity product)
+        {
+            if (product == null)
+            {
+                throw new ArgumentNullException(nameof(product));
+            }
+
+            if (!_products.Contains(product))
+            {
+                return;
+            }
+            
+            _products.Remove(product);
+
+            if (product.AddedBy != this)
+            {
+                product.ReassignWorker();
+            }
         }
         
     }
