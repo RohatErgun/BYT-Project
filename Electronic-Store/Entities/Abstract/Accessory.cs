@@ -1,33 +1,75 @@
-using System;
-using System.Collections.Generic;
-
 namespace Electronic_Store.Entities.Abstract
 {
-    [Serializable]
-    public abstract class Accessory : ProductEntity
+    [Flags]
+    public enum AccessoryRole
     {
-        // Example: Type of accessory (Cable, Case, Charger)
-        public string Category { get; set; } 
+        None    = 0,
+        Case    = 1,
+        Charger = 2,
+        Cable   = 4
+    } 
+    public class Accessory : ProductEntity
+    {
+        public AccessoryRole Roles { get; private set; }
 
-        // List of products this accessory works with
-        private List<ProductEntity> _compatibleModels = new List<ProductEntity>();
+        private readonly List<ProductEntity> _compatibleModels = new();
         public IReadOnlyList<ProductEntity> CompatibleModels => _compatibleModels.AsReadOnly();
 
-        protected Accessory(
-            decimal price, string brand, string model, string color, string material,
-            string category)
-            : base(price, brand, model, color, material)
+        public string? CaseModel { get; private set; }
+
+        public int? PowerVolt { get; private set; }
+
+        public decimal? CableLength { get; private set; }
+        public string? CableType { get; private set; }
+
+        public Accessory(
+            decimal price,
+            string brand,
+            string model,
+            string color,
+            string material,
+            AccessoryRole roles
+        ) : base(price, brand, model, color, material)
         {
-            if (string.IsNullOrWhiteSpace(category)) throw new ArgumentException("Category cannot be empty");
-            Category = category;
+            if (roles == AccessoryRole.None)
+                throw new ArgumentException("Accessory must have at least one role.");
+
+            Roles = roles;
+        }
+
+        public bool IsCase => Roles.HasFlag(AccessoryRole.Case);
+        public bool IsCharger => Roles.HasFlag(AccessoryRole.Charger);
+        public bool IsCable => Roles.HasFlag(AccessoryRole.Cable);
+
+        public void ConfigureCase(string caseModel)
+        {
+            EnsureRole(AccessoryRole.Case);
+            CaseModel = caseModel;
+        }
+
+        public void ConfigureCharger(int powerVolt)
+        {
+            EnsureRole(AccessoryRole.Charger);
+            PowerVolt = powerVolt;
+        }
+
+        public void ConfigureCable(decimal length, string type)
+        {
+            EnsureRole(AccessoryRole.Cable);
+            CableLength = length;
+            CableType = type;
         }
 
         public void AddCompatibleModel(ProductEntity product)
         {
-            if(product != null && !_compatibleModels.Contains(product))
-            {
+            if (product != null && !_compatibleModels.Contains(product))
                 _compatibleModels.Add(product);
-            }
+        }
+
+        private void EnsureRole(AccessoryRole role)
+        {
+            if (!Roles.HasFlag(role))
+                throw new InvalidOperationException($"Accessory does not support role: {role}");
+        }
         }
     }
-}
