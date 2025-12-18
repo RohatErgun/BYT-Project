@@ -36,9 +36,7 @@ namespace Electronic_Store.Entities.Concrete
 
         public DepartmentEntity() { }
 
-        // ------------------------
-        // 🔥 REVERSE ASSOCIATION FIXED (Hocanın istediği şekil)
-        // ------------------------
+       
         public void AddWorker(WorkerEntity worker)
         {
             if (worker == null)
@@ -66,7 +64,7 @@ namespace Electronic_Store.Entities.Concrete
             if (!_workers.Contains(worker))
                 return;
 
-            // UML: 1..* → at least one worker required
+            // UML: 1..* 
             if (_workers.Count == 1)
                 throw new InvalidOperationException("A Department must have at least one Worker.");
 
