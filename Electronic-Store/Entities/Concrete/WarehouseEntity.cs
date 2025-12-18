@@ -11,6 +11,9 @@ public class WarehouseEntity : BaseEntity
     
     private List<ProductStock> _inventory = new();
     public List<ProductStock> Inventory => _inventory;
+    
+    private List<StorageRoomEntity> _storageRooms = new List<StorageRoomEntity>();
+    public IReadOnlyList<StorageRoomEntity> StorageRooms => _storageRooms.AsReadOnly();
 
     public AddressAttribute Address
     {
@@ -23,16 +26,51 @@ public class WarehouseEntity : BaseEntity
         }
     }
 
-    public WarehouseEntity(AddressAttribute address)
+    public WarehouseEntity(AddressAttribute address, List<(string name, double size)> initialRoomsData)
     {
         Address = address;
+        
+        // Validate Multiplicity Constraint | cannot be less than 3 rooms
+        if (initialRoomsData == null || initialRoomsData.Count < 3)
+        {
+            throw new ArgumentException("A Warehouse must consist of at least 3 Storage Rooms.");
+        }
+        
+        foreach (var roomData in initialRoomsData)
+        {
+            new StorageRoomEntity(this, roomData.name, roomData.size);
+        }
     }
     
-    // Qualified - Ass on; Product Values : brand, model, color, material
-    // 
-    private Dictionary<string, ProductStock> _qualifiedInventory= new Dictionary<string, ProductStock>();
+    public void AddStorageRoom(StorageRoomEntity room)
+    {
+        if (room == null) throw new ArgumentNullException(nameof(room));
+        
+        if (!_storageRooms.Contains(room) && room.Warehouse == this)
+        {
+            _storageRooms.Add(room);
+        }
+    }
 
-    // Keys
+    public void RemoveStorageRoom(StorageRoomEntity room)
+    {
+        if (room == null) throw new ArgumentNullException(nameof(room));
+
+        if (_storageRooms.Contains(room))
+        {
+           
+            if (_storageRooms.Count <= 3)
+            {
+                throw new InvalidOperationException("Cannot remove Storage Room. A Warehouse must have at least 3 rooms.");
+            }
+
+            _storageRooms.Remove(room);
+            
+        }
+    }
+    
+    private Dictionary<string, ProductStock> _qualifiedInventory= new Dictionary<string, ProductStock>();
+    
     private string BuildQualifier(ProductEntity product)
     {
         return $"{product.Brand.ToLowerInvariant()}|" +
