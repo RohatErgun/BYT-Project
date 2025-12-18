@@ -14,6 +14,16 @@ namespace ElectronicStore.Tests
             { }
         }
         
+        private List<(string, double)> GetDefaultStorageRooms()
+        {
+            return new List<(string, double)>
+            {
+                ("Main Room", 500),
+                ("Back Room", 300),
+                ("Loading Dock", 400)
+            };
+        }
+        
         private AddressAttribute CreateTestAddress()
         {
             return new AddressAttribute("USA", "New York", "5th Ave", 101, "10001");
@@ -34,7 +44,7 @@ namespace ElectronicStore.Tests
         {
            
             var product = new TestProductEntity(100, "Sony", "ModelX", "Black", "Plastic");
-            var warehouse = new WarehouseEntity(CreateTestAddress());
+            var warehouse = new WarehouseEntity(CreateTestAddress(), GetDefaultStorageRooms());
             int initialQuantity = 50;
             
             
@@ -59,7 +69,7 @@ namespace ElectronicStore.Tests
         {
             
             var product = new TestProductEntity(100, "Sony", "ModelX", "Black", "Plastic");
-            var warehouse = new WarehouseEntity(CreateTestAddress());
+            var warehouse = new WarehouseEntity(CreateTestAddress(), GetDefaultStorageRooms());
             var stock = new ProductStock(product, warehouse, 10);
             
             stock.Quantity = 25;
@@ -83,7 +93,7 @@ namespace ElectronicStore.Tests
             string material = "Glass";
 
             var product = new TestProductEntity(1000, brand, model, color, material);
-            var warehouse = new WarehouseEntity(CreateTestAddress());
+            var warehouse = new WarehouseEntity(CreateTestAddress(), GetDefaultStorageRooms());
             var stock = new ProductStock(product, warehouse, 100);
 
             
@@ -99,7 +109,7 @@ namespace ElectronicStore.Tests
         public void GetStockByQualifiers_ShouldReturnNull_WhenQualifiersDoNotMatch()
         {
             var product = new TestProductEntity(1000, "BrandA", "ModelA", "ColorA", "MaterialA");
-            var warehouse = new WarehouseEntity(CreateTestAddress());
+            var warehouse = new WarehouseEntity(CreateTestAddress(), GetDefaultStorageRooms());
             new ProductStock(product, warehouse, 10);
 
             
@@ -116,7 +126,7 @@ namespace ElectronicStore.Tests
         public void Constructor_ShouldThrowException_WhenNegativeQuantity()
         {
             var product = new TestProductEntity(100, "B", "M", "C", "M");
-            var warehouse = new WarehouseEntity(CreateTestAddress());
+            var warehouse = new WarehouseEntity(CreateTestAddress(), GetDefaultStorageRooms());
 
             Assert.Throws<ArgumentException>(() =>
             {
@@ -128,7 +138,7 @@ namespace ElectronicStore.Tests
         public void AddStock_ShouldThrowException_WhenDuplicateQualifiersAddedToSameWarehouse()
         {
             
-            var warehouse = new WarehouseEntity(CreateTestAddress());
+            var warehouse = new WarehouseEntity(CreateTestAddress(), GetDefaultStorageRooms());
             
             // Product 1
             var product1 = new TestProductEntity(500, "Dell", "XPS", "Silver", "Metal");
@@ -142,14 +152,14 @@ namespace ElectronicStore.Tests
                 new ProductStock(product2, warehouse, 5);
             });
 
-            StringAssert.Contains("qualifiers already exists", ex.Message);
+            StringAssert.Contains("already exists", ex.Message);
         }
 
         [Test]
         public void Constructor_ShouldThrowException_WhenReferencesAreNull()
         {
             var product = new TestProductEntity(100, "B", "M", "C", "M");
-            var warehouse = new WarehouseEntity(CreateTestAddress());
+            var warehouse = new WarehouseEntity(CreateTestAddress(), GetDefaultStorageRooms());
 
             // Null Product
             Assert.Throws<ArgumentNullException>(() => new ProductStock(null, warehouse, 10));
