@@ -9,7 +9,19 @@ namespace ElectronicStore.Tests
         private class TestProduct : ProductEntity
         {
             public TestProduct(decimal price, string brand, string model, string color, string material)
-                : base(price, brand, model, color, material) { }
+                : base(
+                    price,
+                    brand,
+                    model,
+                    color,
+                    material,
+                    ProductCondition.New,
+                    new NewProductInfo(
+                        DateTime.UtcNow,
+                        TimeSpan.FromDays(365)
+                    )
+                )
+            { }
         }
 
         // Promotion AddProduct 

@@ -8,7 +8,7 @@ public class WorkerProductAssociationTests
 {
     private class TestProductEntity(
         decimal price, string brand, string model, string color, string material
-        ) : ProductEntity(price, brand, model, color, material);
+        ) : ProductEntity(price, brand, model, color, material, ProductCondition.New, new NewProductInfo(DateTime.UtcNow, TimeSpan.FromDays(365)));
     
     //  1 - ADDING PRODUCT AS WORKER
     [Test]

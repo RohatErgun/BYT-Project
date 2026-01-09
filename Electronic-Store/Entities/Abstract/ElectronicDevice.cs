@@ -1,8 +1,5 @@
-using System;
-
 namespace Electronic_Store.Entities.Abstract
 {
-    [Serializable]
     public abstract class ElectronicDevice : ProductEntity
     {
         // --- Attributes ---
@@ -32,11 +29,24 @@ namespace Electronic_Store.Entities.Abstract
 
         //  Constructor 
         protected ElectronicDevice(
-            // ProductEntity params
-            decimal price, string brand, string model, string color, string material,
-            // ElectronicDevice params
-            int batteryLifeHours, int warrantyMonths) 
-            : base(price, brand, model, color, material) // Pass up to Parent
+            decimal price,
+            string brand,
+            string model,
+            string color,
+            string material,
+            int batteryLifeHours,
+            int warrantyMonths,
+            ProductCondition condition = ProductCondition.New
+        ) : base(
+            price,
+            brand,
+            model,
+            color,
+            material,
+            condition,
+            newInfo: condition == ProductCondition.New ? new NewProductInfo(DateTime.UtcNow, TimeSpan.FromDays(warrantyMonths * 30)) : null,
+            refurbishedInfo: condition == ProductCondition.Refurbished ? new RefurbishedProductInfo() : null
+        )
         {
             BatteryLifeHours = batteryLifeHours;
             WarrantyMonths = warrantyMonths;

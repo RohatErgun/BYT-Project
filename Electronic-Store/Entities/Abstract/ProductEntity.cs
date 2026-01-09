@@ -3,13 +3,35 @@ using Electronic_Store.Entities.Concrete;
 
 namespace Electronic_Store.Entities.Abstract
 {
-    [Serializable]
+    public enum ProductCondition
+    {
+        New,
+        Refurbished
+    }
+
+    public class NewProductInfo
+    {
+        public DateTime ManufacturingDate { get;}
+        public TimeSpan WarrantyPeriod { get;}
+
+        public NewProductInfo(DateTime manufacturingDate, TimeSpan warrantyPeriod)
+        {
+            ManufacturingDate = manufacturingDate;
+            WarrantyPeriod = warrantyPeriod;
+        }
+    }
+
+    public class RefurbishedProductInfo
+    {
+        public decimal DiscountPercentage { get;}
+
+        public RefurbishedProductInfo()
+        {
+            DiscountPercentage = 0.10m;
+        }
+    }
     public abstract class ProductEntity : BaseEntity
     {
-
-        private static List<ProductEntity> _productsExtent = new List<ProductEntity>();
-        public static IReadOnlyList<ProductEntity> ProductsExtent => _productsExtent.AsReadOnly();
-
 
         private decimal _price;
         private string _brand;
@@ -17,23 +39,20 @@ namespace Electronic_Store.Entities.Abstract
         private string _color;
         private string _material;
 
-
-
-        // PRODUCT - WAREHOUSE
-        private List<ProductStock> _stocks = new List<ProductStock>();
-        public List<ProductStock> Stocks => _stocks;
-
-
-        // PRODUCT - ORDER
-        private List<OrderLine> _orderLines = new List<OrderLine>();
-        public IReadOnlyList<OrderLine> OrderLines => _orderLines.AsReadOnly();
-
-
-        // PRODUCT 0..1 - 0..* PROMOTION
-        public PromotionEntity? Promotion { get; private set; }
-
-
-        protected ProductEntity(decimal price, string brand, string model, string color, string material)
+        public ProductCondition Condition { get;}
+        
+        public NewProductInfo? NewInfo { get;}
+        public RefurbishedProductInfo? RefurbishedInfo { get;}
+    
+        protected ProductEntity(
+            decimal price, 
+            string brand, 
+            string model,
+            string color,
+            string material,
+            ProductCondition condition,
+            NewProductInfo? newInfo =null,
+            RefurbishedProductInfo? refurbishedInfo = null)
         {
             if (price < 0) throw new ArgumentException("Price cannot be negative.");
             if (string.IsNullOrWhiteSpace(brand)) throw new ArgumentException("Brand cannot be empty.");
@@ -46,10 +65,53 @@ namespace Electronic_Store.Entities.Abstract
             _model = model;
             _color = color;
             _material = material;
-
-            _productsExtent.Add(this);
+            
+            ValidateCondition(condition, newInfo, refurbishedInfo);
+            Condition = condition;
+            NewInfo = newInfo;
+            RefurbishedInfo = refurbishedInfo;
         }
 
+        private static void ValidateCondition(
+            ProductCondition condition,
+            NewProductInfo? newInfo,
+            RefurbishedProductInfo? refurbishedInfo)
+        {
+            if (condition == ProductCondition.New)
+            {
+                if (newInfo == null)
+                    throw new ArgumentException("New product requires NewProductInfo.");
+                if (refurbishedInfo != null)
+                    throw new ArgumentException("New product cannot have RefurbishedProductInfo.");
+            }
+            if (condition == ProductCondition.Refurbished)
+            {
+                if (refurbishedInfo == null)
+                    throw new ArgumentException("Refurbished product requires RefurbishedProductInfo.");
+                if (newInfo != null)
+                    throw new ArgumentException("Refurbished product cannot have NewProductInfo.");
+            }
+        }
+        public decimal GetEffectivePrice()
+        {
+            if (Condition == ProductCondition.Refurbished)
+                return Price * (1 - RefurbishedInfo!.DiscountPercentage);
+
+            return Price;
+        }
+        // PRODUCT - WAREHOUSE
+        private List<ProductStock> _stocks = new List<ProductStock>();
+        public List<ProductStock> Stocks => _stocks;
+
+
+        // PRODUCT - ORDER
+        private List<OrderLine> _orderLines = new List<OrderLine>();
+        public IReadOnlyList<OrderLine> OrderLines => _orderLines.AsReadOnly();
+
+
+        // PRODUCT 0..1 - 0..* PROMOTION
+        public PromotionEntity? Promotion { get; private set; }
+        
         public decimal Price
         {
             get => _price;

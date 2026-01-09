@@ -8,7 +8,18 @@ namespace ElectronicStore.Tests
         private class TestProductEntity : ProductEntity
         {
             public TestProductEntity(decimal price, string brand, string model, string color, string material)
-                : base(price, brand, model, color, material)
+                : base(
+                    price,
+                    brand,
+                    model,
+                    color,
+                    material,
+                    ProductCondition.New,
+                    new NewProductInfo(
+                        DateTime.UtcNow,
+                        TimeSpan.FromDays(365)
+                    )
+                )
             { }
         }
 
@@ -42,12 +53,7 @@ namespace ElectronicStore.Tests
             });
         }
 
-        [Test]
-        public void ClassExtent_ShouldAddProduct_WhenCreated()
-        {
-            var product = new TestProductEntity(50, "BrandB", "ModelY", "Blue", "Metal");
-            CollectionAssert.Contains(ProductEntity.ProductsExtent, product);
-        }
+        
 
         [Test]
         public void Price_Setter_ShouldThrowException_WhenNegative()

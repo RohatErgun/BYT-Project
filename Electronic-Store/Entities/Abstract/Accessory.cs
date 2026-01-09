@@ -48,9 +48,9 @@ namespace Electronic_Store.Entities.Abstract
         private readonly List<ProductEntity> _compatibleModels = new();
         public IReadOnlyList<ProductEntity> CompatibleModels => _compatibleModels.AsReadOnly();
 
-        public CaseInfo? Case { get; set; }
-        public ChargerInfo? Charger { get; set; }
-        public CableInfo? Cable { get; set; }
+        public CaseInfo? Case { get;}
+        public ChargerInfo? Charger { get;}
+        public CableInfo? Cable { get;}
 
         public bool IsCase => Roles.HasFlag(AccessoryRole.Case);
         public bool IsCharger => Roles.HasFlag(AccessoryRole.Charger);
@@ -63,10 +63,20 @@ namespace Electronic_Store.Entities.Abstract
             string color,
             string material,
             AccessoryRole roles,
+            ProductCondition condition = ProductCondition.New,
             CaseInfo? caseInfo = null,
             ChargerInfo? chargerInfo = null,
             CableInfo? cableInfo = null
-        ) : base(price, brand, model, color, material)
+        ) : base(
+            price,
+            brand,
+            model,
+            color,
+            material,
+            condition,
+            newInfo: condition == ProductCondition.New ? new NewProductInfo(DateTime.UtcNow, TimeSpan.FromDays(365)) : null,
+            refurbishedInfo: condition == ProductCondition.Refurbished ? new RefurbishedProductInfo() : null
+        )
         {
             if (roles == AccessoryRole.None)
                 throw new ArgumentException("Accessory must have at least one role.");
