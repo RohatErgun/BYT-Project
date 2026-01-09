@@ -67,7 +67,7 @@ public class AccessoryInheritanceTests
 
         accessory.ConfigureCase("iPhone 15");
 
-        if (accessory.CaseModel != null) Assert.AreEqual("iPhone 15", accessory.CaseModel);
+        if (accessory.Case.CaseModel != null) Assert.AreEqual("iPhone 15", accessory.Case.CaseModel);
     }
     
     [Test]

@@ -7,7 +7,39 @@ namespace Electronic_Store.Entities.Abstract
         Case    = 1,
         Charger = 2,
         Cable   = 4
-    } 
+    }
+
+    public class CaseInfo
+    {
+      public string CaseModel { get; set; }
+
+      public CaseInfo(string caseModel)
+      {
+          CaseModel = caseModel ?? throw new ArgumentNullException(nameof(caseModel));
+      }
+    }
+
+    public class ChargerInfo
+    { 
+        public int PowerVolt { get; set; }
+
+        public ChargerInfo(int powerVolt)
+        {
+            PowerVolt = powerVolt;
+        }
+    }
+
+    public class CableInfo
+    {
+        public decimal Length {get; set;}
+        public String Type {get;set;}
+
+        public CableInfo(decimal length, string type)
+        {
+            Length = length;
+            Type = type ?? throw new ArgumentNullException(nameof(type));
+        }
+    }
     public class Accessory : ProductEntity
     {
         public AccessoryRole Roles { get; private set; }
@@ -15,13 +47,10 @@ namespace Electronic_Store.Entities.Abstract
         private readonly List<ProductEntity> _compatibleModels = new();
         public IReadOnlyList<ProductEntity> CompatibleModels => _compatibleModels.AsReadOnly();
 
-        public string? CaseModel { get; private set; }
-
-        public int? PowerVolt { get; private set; }
-
-        public decimal? CableLength { get; private set; }
-        public string? CableType { get; private set; }
-
+        public CaseInfo? Case { get; set; }
+        public ChargerInfo? Charger { get; set; }
+        public CableInfo? Cable { get; set; }
+        
         public Accessory(
             decimal price,
             string brand,
@@ -44,20 +73,19 @@ namespace Electronic_Store.Entities.Abstract
         public void ConfigureCase(string caseModel)
         {
             EnsureRole(AccessoryRole.Case);
-            CaseModel = caseModel;
+            Case = new CaseInfo(caseModel);
         }
 
         public void ConfigureCharger(int powerVolt)
         {
             EnsureRole(AccessoryRole.Charger);
-            PowerVolt = powerVolt;
+            Charger = new ChargerInfo(powerVolt);
         }
 
         public void ConfigureCable(decimal length, string type)
         {
             EnsureRole(AccessoryRole.Cable);
-            CableLength = length;
-            CableType = type;
+            Cable = new CableInfo(length, type);
         }
 
         public void AddCompatibleModel(ProductEntity product)
