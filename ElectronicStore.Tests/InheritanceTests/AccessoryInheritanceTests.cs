@@ -18,9 +18,9 @@ public class AccessoryInheritanceTests
                 AccessoryRole.None
             ));
     }
-    
+
     [Test]
-    public void Constructor_ShouldCreateAccessory_WithSingleRole()
+    public void Constructor_ShouldCreateAccessory_WithSingleRole_AndNoRoleData()
     {
         var accessory = new Accessory(
             20m,
@@ -28,16 +28,20 @@ public class AccessoryInheritanceTests
             "CaseX",
             "Red",
             "Rubber",
-            AccessoryRole.Case
+            AccessoryRole.Case,
+            caseInfo: new CaseInfo("iPhone 15")
         );
 
         Assert.True(accessory.IsCase);
         Assert.False(accessory.IsCharger);
         Assert.False(accessory.IsCable);
+
+        Assert.NotNull(accessory.Case);
+        Assert.AreEqual("iPhone 15", accessory.Case!.CaseModel);
     }
-    
+
     [Test]
-    public void Constructor_ShouldAllow_MultipleRoles()
+    public void Constructor_ShouldAllow_MultipleRoles_WithMatchingData()
     {
         var accessory = new Accessory(
             80m,
@@ -45,46 +49,75 @@ public class AccessoryInheritanceTests
             "PowerCase",
             "Black",
             "Silicone",
-            AccessoryRole.Case | AccessoryRole.Charger
+            AccessoryRole.Case | AccessoryRole.Charger,
+            caseInfo: new CaseInfo("Galaxy S24"),
+            chargerInfo: new ChargerInfo(25)
         );
 
         Assert.True(accessory.IsCase);
         Assert.True(accessory.IsCharger);
         Assert.False(accessory.IsCable);
+
+        Assert.NotNull(accessory.Case);
+        Assert.NotNull(accessory.Charger);
+        Assert.IsNull(accessory.Cable);
     }
-    
+
     [Test]
-    public void ConfigureCase_ShouldSetCaseModel_WhenRoleIsCase()
+    public void Constructor_ShouldThrow_WhenCaseRoleHasNoCaseInfo()
     {
-        var accessory = new Accessory(
-            25m,
-            "OtterBox",
-            "Defender",
-            "Blue",
-            "Plastic",
-            AccessoryRole.Case
-        );
-
-        accessory.ConfigureCase("iPhone 15");
-
-        if (accessory.Case.CaseModel != null) Assert.AreEqual("iPhone 15", accessory.Case.CaseModel);
+        Assert.Throws<ArgumentException>(() =>
+            new Accessory(
+                25m,
+                "OtterBox",
+                "Defender",
+                "Blue",
+                "Plastic",
+                AccessoryRole.Case
+            ));
     }
-    
+
     [Test]
-    public void ConfigureCase_ShouldThrow_WhenRoleIsNotCase()
+    public void Constructor_ShouldThrow_WhenCaseInfoProvidedWithoutCaseRole()
     {
-        var accessory = new Accessory(
-            40m,
-            "Anker",
-            "ChargerX",
-            "White",
-            "Plastic",
-            AccessoryRole.Charger
-        );
-
-        Assert.Throws<InvalidOperationException>(() =>
-            accessory.ConfigureCase("Galaxy S24"));
+        Assert.Throws<ArgumentException>(() =>
+            new Accessory(
+                40m,
+                "Anker",
+                "ChargerX",
+                "White",
+                "Plastic",
+                AccessoryRole.Charger,
+                caseInfo: new CaseInfo("Galaxy S24")
+            ));
     }
-    
 
+    [Test]
+    public void Constructor_ShouldThrow_WhenChargerRoleHasNoChargerInfo()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new Accessory(
+                40m,
+                "Anker",
+                "ChargerX",
+                "White",
+                "Plastic",
+                AccessoryRole.Charger
+            ));
+    }
+
+    [Test]
+    public void Constructor_ShouldThrow_WhenCableInfoProvidedWithoutCableRole()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new Accessory(
+                30m,
+                "Brand",
+                "CableX",
+                "Black",
+                "Plastic",
+                AccessoryRole.Case,
+                cableInfo: new CableInfo(1.5m, "USB-C")
+            ));
+    }
 }

@@ -3,24 +3,24 @@ namespace Electronic_Store.Entities.Abstract
     [Flags]
     public enum AccessoryRole
     {
-        None    = 0,
-        Case    = 1,
+        None = 0,
+        Case = 1,
         Charger = 2,
-        Cable   = 4
+        Cable = 4
     }
 
     public class CaseInfo
     {
-      public string CaseModel { get; set; }
+        public string CaseModel { get; set; }
 
-      public CaseInfo(string caseModel)
-      {
-          CaseModel = caseModel ?? throw new ArgumentNullException(nameof(caseModel));
-      }
+        public CaseInfo(string caseModel)
+        {
+            CaseModel = caseModel ?? throw new ArgumentNullException(nameof(caseModel));
+        }
     }
 
     public class ChargerInfo
-    { 
+    {
         public int PowerVolt { get; set; }
 
         public ChargerInfo(int powerVolt)
@@ -31,8 +31,8 @@ namespace Electronic_Store.Entities.Abstract
 
     public class CableInfo
     {
-        public decimal Length {get; set;}
-        public String Type {get;set;}
+        public decimal Length { get; set; }
+        public String Type { get; set; }
 
         public CableInfo(decimal length, string type)
         {
@@ -40,6 +40,7 @@ namespace Electronic_Store.Entities.Abstract
             Type = type ?? throw new ArgumentNullException(nameof(type));
         }
     }
+
     public class Accessory : ProductEntity
     {
         public AccessoryRole Roles { get; private set; }
@@ -50,42 +51,57 @@ namespace Electronic_Store.Entities.Abstract
         public CaseInfo? Case { get; set; }
         public ChargerInfo? Charger { get; set; }
         public CableInfo? Cable { get; set; }
-        
+
+        public bool IsCase => Roles.HasFlag(AccessoryRole.Case);
+        public bool IsCharger => Roles.HasFlag(AccessoryRole.Charger);
+        public bool IsCable => Roles.HasFlag(AccessoryRole.Cable);
+
         public Accessory(
             decimal price,
             string brand,
             string model,
             string color,
             string material,
-            AccessoryRole roles
+            AccessoryRole roles,
+            CaseInfo? caseInfo = null,
+            ChargerInfo? chargerInfo = null,
+            CableInfo? cableInfo = null
         ) : base(price, brand, model, color, material)
         {
             if (roles == AccessoryRole.None)
                 throw new ArgumentException("Accessory must have at least one role.");
 
+            ValidateRoleData(roles, caseInfo, chargerInfo, cableInfo);
+
             Roles = roles;
+            Case = caseInfo;
+            Charger = chargerInfo;
+            Cable = cableInfo;
         }
 
-        public bool IsCase => Roles.HasFlag(AccessoryRole.Case);
-        public bool IsCharger => Roles.HasFlag(AccessoryRole.Charger);
-        public bool IsCable => Roles.HasFlag(AccessoryRole.Cable);
-
-        public void ConfigureCase(string caseModel)
+        private static void ValidateRoleData(
+            AccessoryRole roles,
+            CaseInfo? caseInfo,
+            ChargerInfo? chargerInfo,
+            CableInfo? cableInfo)
         {
-            EnsureRole(AccessoryRole.Case);
-            Case = new CaseInfo(caseModel);
-        }
+            if (roles.HasFlag(AccessoryRole.Case) && caseInfo == null)
+                throw new ArgumentException("Case role requires CaseInfo.");
 
-        public void ConfigureCharger(int powerVolt)
-        {
-            EnsureRole(AccessoryRole.Charger);
-            Charger = new ChargerInfo(powerVolt);
-        }
+            if (!roles.HasFlag(AccessoryRole.Case) && caseInfo != null)
+                throw new ArgumentException("CaseInfo provided but Case role not specified.");
 
-        public void ConfigureCable(decimal length, string type)
-        {
-            EnsureRole(AccessoryRole.Cable);
-            Cable = new CableInfo(length, type);
+            if (roles.HasFlag(AccessoryRole.Charger) && chargerInfo == null)
+                throw new ArgumentException("Charger role requires ChargerInfo.");
+
+            if (!roles.HasFlag(AccessoryRole.Charger) && chargerInfo != null)
+                throw new ArgumentException("ChargerInfo provided but Charger role not specified.");
+
+            if (roles.HasFlag(AccessoryRole.Cable) && cableInfo == null)
+                throw new ArgumentException("Cable role requires CableInfo.");
+
+            if (!roles.HasFlag(AccessoryRole.Cable) && cableInfo != null)
+                throw new ArgumentException("CableInfo provided but Cable role not specified.");
         }
 
         public void AddCompatibleModel(ProductEntity product)
@@ -93,11 +109,5 @@ namespace Electronic_Store.Entities.Abstract
             if (product != null && !_compatibleModels.Contains(product))
                 _compatibleModels.Add(product);
         }
-
-        private void EnsureRole(AccessoryRole role)
-        {
-            if (!Roles.HasFlag(role))
-                throw new InvalidOperationException($"Accessory does not support role: {role}");
-        }
-        }
     }
+}
